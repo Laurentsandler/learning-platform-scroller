@@ -152,31 +152,21 @@
             text-align: center;
             font-size: 36px;
             color: #aec6cf;
-            animation: riseUp 2s ease-in-out forwards;
+            animation: riseUpSlow 5s ease-in-out forwards;
         }
 
         .welcome-banner .subtext {
             font-size: 24px;
             margin-top: 10px;
             color: #aec6cf;
-            animation: fadeIn 2s ease-in-out forwards;
         }
 
-        @keyframes riseUp {
+        @keyframes riseUpSlow {
             from {
-                transform: translate(-50%, 100%);
+                transform: translate(-50%, 50%);
             }
             to {
                 transform: translate(-50%, -50%);
-            }
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
             }
         }
     </style>
@@ -187,7 +177,7 @@
 
 <div class="welcome-banner">
     <div>Welcome to Scaller</div>
-    <div class="subtext" style="opacity: 0;">Next-gen engaging learning powered by AI</div>
+    <div class="subtext">Next-gen engaging learning powered by AI</div>
 </div>
 
 <div class="greeting" id="greetingText"></div>
@@ -233,9 +223,6 @@
             greetingText.style.display = 'none';
             welcomeContainer.style.display = 'block';
             homeScreenContainer.style.display = 'none';
-            setTimeout(() => {
-                welcomeBanner.style.display = 'none';
-            }, 4000); // Hide welcome banner after 4 seconds
         }
 
         document.getElementById('startButton').addEventListener('click', function () {
@@ -264,10 +251,6 @@
         buttons.forEach(button => {
             button.style.animation = 'buttonShift 15s infinite alternate ease-in-out';
         });
-
-        setTimeout(() => {
-            document.querySelector('.welcome-banner .subtext').style.opacity = '1';
-        }, 1000);
     });
 
     function handleSubjectClick(subject) {
