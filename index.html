@@ -24,24 +24,21 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at 25% 25%, #ffd1dc, transparent, transparent),
-                        radial-gradient(circle at 75% 25%, #c6e2ff, transparent, transparent),
-                        radial-gradient(circle at 25% 75%, #e0bbf5, transparent, transparent),
-                        radial-gradient(circle at 75% 75%, #b3ffd9, transparent, transparent);
-            background-size: 200% 200%;
-            animation: backgroundShift 15s infinite linear;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: backgroundShift 15s ease infinite;
             z-index: -1;
         }
 
         @keyframes backgroundShift {
             0% {
-                background-position: 0% 0%;
+                background-position: 0% 50%;
             }
             50% {
-                background-position: 100% 100%;
+                background-position: 100% 50%;
             }
             100% {
-                background-position: 0% 0%;
+                background-position: 0% 50%;
             }
         }
 
@@ -50,6 +47,7 @@
             max-width: 400px;
             padding: 20px;
             text-align: center;
+            z-index: 2;
         }
 
         .greeting {
@@ -145,14 +143,15 @@
 
         .welcome-banner {
             position: absolute;
-            top: 50%;
+            bottom: -10%;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translateX(-50%);
             width: 100%;
             text-align: center;
             font-size: 36px;
             color: #aec6cf;
-            animation: riseUpSlow 5s ease-in-out forwards;
+            animation: riseUpSlow 7s ease-in-out forwards;
+            z-index: 1;
         }
 
         .welcome-banner .subtext {
@@ -163,10 +162,10 @@
 
         @keyframes riseUpSlow {
             from {
-                transform: translate(-50%, 50%);
+                transform: translate(-50%, 100%);
             }
             to {
-                transform: translate(-50%, -50%);
+                transform: translate(-50%, -100%);
             }
         }
     </style>
@@ -219,10 +218,12 @@
             greetingText.style.display = 'block';
             welcomeContainer.style.display = 'none';
             homeScreenContainer.style.display = 'block';
+            welcomeBanner.style.display = 'none';  // Hide welcome text on the home screen
         } else {
             greetingText.style.display = 'none';
             welcomeContainer.style.display = 'block';
             homeScreenContainer.style.display = 'none';
+            welcomeBanner.style.display = 'block';  // Show welcome text only on the welcome page
         }
 
         document.getElementById('startButton').addEventListener('click', function () {
@@ -242,6 +243,7 @@
                 greetingText.style.display = 'block';
                 welcomeContainer.style.display = 'none';
                 homeScreenContainer.style.display = 'block';
+                welcomeBanner.style.display = 'none';  // Hide welcome text on the home screen
             } else {
                 alert('Please enter both your name and grade.');
             }
