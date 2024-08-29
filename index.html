@@ -18,27 +18,31 @@
             align-items: center;
         }
 
-        .background {
+        body::before {
+            content: "";
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-            background-size: 400% 400%;
-            animation: backgroundShift 15s ease infinite;
+            background: radial-gradient(circle at 25% 25%, #ff7f50, transparent, transparent),
+                        radial-gradient(circle at 75% 25%, #6495ed, transparent, transparent),
+                        radial-gradient(circle at 25% 75%, #ff69b4, transparent, transparent),
+                        radial-gradient(circle at 75% 75%, #ba55d3, transparent, transparent);
+            background-size: 200% 200%;
+            animation: backgroundShift 15s infinite linear;
             z-index: -1;
         }
 
         @keyframes backgroundShift {
             0% {
-                background-position: 0% 50%;
+                background-position: 0% 0%;
             }
             50% {
-                background-position: 100% 50%;
+                background-position: 100% 100%;
             }
             100% {
-                background-position: 0% 50%;
+                background-position: 0% 0%;
             }
         }
 
@@ -47,7 +51,6 @@
             max-width: 400px;
             padding: 20px;
             text-align: center;
-            z-index: 2;
         }
 
         .greeting {
@@ -55,7 +58,6 @@
             position: absolute;
             top: 10px;
             left: 10px;
-            display: none;
         }
 
         input {
@@ -96,28 +98,25 @@
 
         .subject-button {
             width: 100%;
-            padding: 16px;
+            padding: 12px;
             margin: 10px 0;
             border: none;
             border-radius: 8px;
-            background: linear-gradient(135deg, #aec6cf, #b2f2bb, #fef08a, #cdb4db);
+            background-color: #6c63ff;
             color: #fff;
-            font-size: 20px;
+            font-size: 18px;
             cursor: pointer;
-            transition: transform 0.3s ease, background-position 1.5s ease, background-color 0.3s ease;
-            background-size: 200% 200%;
+            transition: transform 0.3s ease, background-color 0.3s ease;
         }
 
         .subject-button:hover {
+            background-color: #5a54e7;
             transform: scale(1.05);
         }
 
         .subject-button:active {
+            background-color: #4e4ac9;
             transform: scale(1);
-        }
-
-        .subject-button.clicked {
-            animation: bounce 0.5s ease-in-out;
         }
 
         @keyframes bounce {
@@ -129,55 +128,12 @@
             }
         }
 
-        @keyframes buttonShift {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
-        }
-
-        .welcome-banner {
-            position: absolute;
-            bottom: -10%;
-            left: 50%;
-            transform: translateX(-10%);
-            width: 100%;
-            text-align: center;
-            font-size: 36px;
-            color: #aec6cf;
-            animation: riseUpSlow 7s ease-in-out forwards;
-            z-index: 1;
-        }
-
-        .welcome-banner .subtext {
-            font-size: 24px;
-            margin-top: 10px;
-            color: #aec6cf;
-        }
-
-        @keyframes riseUpSlow {
-            from {
-                transform: translate(-50%, 100%);
-            }
-            to {
-                transform: translate(-50%, 100%);
-            }
+        .subject-button.clicked {
+            animation: bounce 0.5s ease-in-out;
         }
     </style>
 </head>
 <body>
-
-<div class="background"></div>
-
-<div class="welcome-banner">
-    <div>Welcome to Scaller</div>
-    <div class="subtext">Next-gen engaging learning powered by AI</div>
-</div>
 
 <div class="greeting" id="greetingText"></div>
 
@@ -200,7 +156,6 @@
         const greetingText = document.getElementById('greetingText');
         const welcomeContainer = document.getElementById('welcomeContainer');
         const homeScreenContainer = document.getElementById('homeScreenContainer');
-        const welcomeBanner = document.querySelector('.welcome-banner');
 
         function getGreeting() {
             const hour = new Date().getHours();
@@ -215,15 +170,12 @@
 
         if (userData) {
             greetingText.textContent = `${getGreeting()}, ${userData.name}!`;
-            greetingText.style.display = 'block';
             welcomeContainer.style.display = 'none';
             homeScreenContainer.style.display = 'block';
-            welcomeBanner.style.display = 'none';  // Hide welcome text on the home screen
         } else {
-            greetingText.style.display = 'none';
+            greetingText.textContent = `${getGreeting()}!`;
             welcomeContainer.style.display = 'block';
             homeScreenContainer.style.display = 'none';
-            welcomeBanner.style.display = 'block';  // Show welcome text only on the welcome page
         }
 
         document.getElementById('startButton').addEventListener('click', function () {
@@ -240,18 +192,11 @@
                 alert('Welcome, ' + name + '! Your grade is saved.');
 
                 greetingText.textContent = `${getGreeting()}, ${userData.name}!`;
-                greetingText.style.display = 'block';
                 welcomeContainer.style.display = 'none';
                 homeScreenContainer.style.display = 'block';
-                welcomeBanner.style.display = 'none';  // Hide welcome text on the home screen
             } else {
                 alert('Please enter both your name and grade.');
             }
-        });
-
-        const buttons = document.querySelectorAll('.subject-button');
-        buttons.forEach(button => {
-            button.style.animation = 'buttonShift 15s infinite alternate ease-in-out';
         });
     });
 
