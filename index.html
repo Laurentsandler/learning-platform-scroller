@@ -58,6 +58,7 @@
             position: absolute;
             top: 10px;
             left: 10px;
+            display: none;
         }
 
         input {
@@ -98,25 +99,28 @@
 
         .subject-button {
             width: 100%;
-            padding: 12px;
+            padding: 16px;
             margin: 10px 0;
             border: none;
             border-radius: 8px;
-            background-color: #6c63ff;
+            background: linear-gradient(135deg, #ff7f50, #6495ed);
             color: #fff;
-            font-size: 18px;
+            font-size: 20px;
             cursor: pointer;
-            transition: transform 0.3s ease, background-color 0.3s ease;
+            transition: transform 0.3s ease, background-position 0.5s ease, background-color 0.3s ease;
+            background-size: 200% 200%;
         }
 
         .subject-button:hover {
-            background-color: #5a54e7;
             transform: scale(1.05);
         }
 
         .subject-button:active {
-            background-color: #4e4ac9;
             transform: scale(1);
+        }
+
+        .subject-button.clicked {
+            animation: bounce 0.5s ease-in-out;
         }
 
         @keyframes bounce {
@@ -128,8 +132,16 @@
             }
         }
 
-        .subject-button.clicked {
-            animation: bounce 0.5s ease-in-out;
+        @keyframes buttonShift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
         }
     </style>
 </head>
@@ -170,10 +182,11 @@
 
         if (userData) {
             greetingText.textContent = `${getGreeting()}, ${userData.name}!`;
+            greetingText.style.display = 'block';
             welcomeContainer.style.display = 'none';
             homeScreenContainer.style.display = 'block';
         } else {
-            greetingText.textContent = `${getGreeting()}!`;
+            greetingText.style.display = 'none';
             welcomeContainer.style.display = 'block';
             homeScreenContainer.style.display = 'none';
         }
@@ -192,11 +205,17 @@
                 alert('Welcome, ' + name + '! Your grade is saved.');
 
                 greetingText.textContent = `${getGreeting()}, ${userData.name}!`;
+                greetingText.style.display = 'block';
                 welcomeContainer.style.display = 'none';
                 homeScreenContainer.style.display = 'block';
             } else {
                 alert('Please enter both your name and grade.');
             }
+        });
+
+        const buttons = document.querySelectorAll('.subject-button');
+        buttons.forEach(button => {
+            button.style.animation = 'buttonShift 8s infinite alternate ease-in-out';
         });
     });
 
