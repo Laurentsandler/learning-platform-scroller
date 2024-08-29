@@ -25,10 +25,10 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at 25% 25%, #ff7f50, transparent, transparent),
-                        radial-gradient(circle at 75% 25%, #6495ed, transparent, transparent),
-                        radial-gradient(circle at 25% 75%, #ff69b4, transparent, transparent),
-                        radial-gradient(circle at 75% 75%, #ba55d3, transparent, transparent);
+            background: radial-gradient(circle at 25% 25%, #ffd1dc, transparent, transparent),
+                        radial-gradient(circle at 75% 25%, #c6e2ff, transparent, transparent),
+                        radial-gradient(circle at 25% 75%, #e0bbf5, transparent, transparent),
+                        radial-gradient(circle at 75% 75%, #b3ffd9, transparent, transparent);
             background-size: 200% 200%;
             animation: backgroundShift 15s infinite linear;
             z-index: -1;
@@ -103,12 +103,12 @@
             margin: 10px 0;
             border: none;
             border-radius: 8px;
-            background: linear-gradient(135deg, #ff7f50, #6495ed);
+            background: linear-gradient(135deg, #ff9999, #ffcc99, #ffff99, #ccff99, #99ff99, #99ffcc, #99ffff, #9999ff, #cc99ff, #ff99ff);
             color: #fff;
             font-size: 20px;
             cursor: pointer;
             transition: transform 0.3s ease, background-position 0.5s ease, background-color 0.3s ease;
-            background-size: 200% 200%;
+            background-size: 300% 300%;
         }
 
         .subject-button:hover {
@@ -143,9 +143,47 @@
                 background-position: 0% 50%;
             }
         }
+
+        .welcome-banner {
+            position: absolute;
+            top: -100px;
+            width: 100%;
+            text-align: center;
+            font-size: 24px;
+            animation: slideDown 1s ease-in-out forwards;
+        }
+
+        .welcome-banner .subtext {
+            font-size: 18px;
+            margin-top: 10px;
+            animation: fadeIn 2s ease-in-out forwards;
+        }
+
+        @keyframes slideDown {
+            from {
+                top: -100px;
+            }
+            to {
+                top: 20px;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
+
+<div class="welcome-banner">
+    <div>Welcome to Scaller</div>
+    <div class="subtext" style="opacity: 0;">Next-gen engaging learning powered by AI</div>
+</div>
 
 <div class="greeting" id="greetingText"></div>
 
@@ -217,6 +255,10 @@
         buttons.forEach(button => {
             button.style.animation = 'buttonShift 8s infinite alternate ease-in-out';
         });
+
+        setTimeout(() => {
+            document.querySelector('.welcome-banner .subtext').style.opacity = '1';
+        }, 1000);
     });
 
     function handleSubjectClick(subject) {
