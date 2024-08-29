@@ -18,8 +18,7 @@
             align-items: center;
         }
 
-        body::before {
-            content: "";
+        .background {
             position: absolute;
             top: 0;
             left: 0;
@@ -103,12 +102,12 @@
             margin: 10px 0;
             border: none;
             border-radius: 8px;
-            background: linear-gradient(135deg, #ff9999, #ffcc99, #ffff99, #ccff99, #99ff99, #99ffcc, #99ffff, #9999ff, #cc99ff, #ff99ff);
+            background: linear-gradient(135deg, #aec6cf, #b2f2bb, #fef08a, #cdb4db);
             color: #fff;
             font-size: 20px;
             cursor: pointer;
-            transition: transform 0.3s ease, background-position 0.5s ease, background-color 0.3s ease;
-            background-size: 300% 300%;
+            transition: transform 0.3s ease, background-position 1.5s ease, background-color 0.3s ease;
+            background-size: 200% 200%;
         }
 
         .subject-button:hover {
@@ -146,25 +145,29 @@
 
         .welcome-banner {
             position: absolute;
-            top: -100px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             width: 100%;
             text-align: center;
-            font-size: 24px;
-            animation: slideDown 1s ease-in-out forwards;
+            font-size: 36px;
+            color: #aec6cf;
+            animation: riseUp 2s ease-in-out forwards;
         }
 
         .welcome-banner .subtext {
-            font-size: 18px;
+            font-size: 24px;
             margin-top: 10px;
+            color: #aec6cf;
             animation: fadeIn 2s ease-in-out forwards;
         }
 
-        @keyframes slideDown {
+        @keyframes riseUp {
             from {
-                top: -100px;
+                transform: translate(-50%, 100%);
             }
             to {
-                top: 20px;
+                transform: translate(-50%, -50%);
             }
         }
 
@@ -179,6 +182,8 @@
     </style>
 </head>
 <body>
+
+<div class="background"></div>
 
 <div class="welcome-banner">
     <div>Welcome to Scaller</div>
@@ -206,6 +211,7 @@
         const greetingText = document.getElementById('greetingText');
         const welcomeContainer = document.getElementById('welcomeContainer');
         const homeScreenContainer = document.getElementById('homeScreenContainer');
+        const welcomeBanner = document.querySelector('.welcome-banner');
 
         function getGreeting() {
             const hour = new Date().getHours();
@@ -227,6 +233,9 @@
             greetingText.style.display = 'none';
             welcomeContainer.style.display = 'block';
             homeScreenContainer.style.display = 'none';
+            setTimeout(() => {
+                welcomeBanner.style.display = 'none';
+            }, 4000); // Hide welcome banner after 4 seconds
         }
 
         document.getElementById('startButton').addEventListener('click', function () {
@@ -253,7 +262,7 @@
 
         const buttons = document.querySelectorAll('.subject-button');
         buttons.forEach(button => {
-            button.style.animation = 'buttonShift 8s infinite alternate ease-in-out';
+            button.style.animation = 'buttonShift 15s infinite alternate ease-in-out';
         });
 
         setTimeout(() => {
