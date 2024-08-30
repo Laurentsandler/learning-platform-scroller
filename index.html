@@ -229,14 +229,14 @@
         const startButton = document.getElementById('startButton');
 
         function playMusic() {
-            
+             music.play().catch(() => {
                 // If autoplay is prevented, show the button to allow user to play the audio manually
                 startButton.style.display = 'block';
                 startButton.addEventListener('click', function () {
                     music.play();
                   
                 });
-           
+             });
         }
 
         playMusic();
