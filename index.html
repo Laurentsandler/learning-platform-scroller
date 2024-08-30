@@ -136,7 +136,7 @@
 </head>
 <body>
 
-<audio autoplay>
+<audio id="backgroundAudio" muted>
     <source src="https://audio.com/laurent-sandler/audio/mp4-to-mp3-conversion-result" type="audio/mp3">
     Your browser does not support the audio element.
 </audio>
@@ -162,6 +162,7 @@
         const greetingText = document.getElementById('greetingText');
         const welcomeContainer = document.getElementById('welcomeContainer');
         const homeScreenContainer = document.getElementById('homeScreenContainer');
+        const backgroundAudio = document.getElementById('backgroundAudio');
 
         function getGreeting() {
             const hour = new Date().getHours();
@@ -184,6 +185,12 @@
             welcomeContainer.style.display = 'block';
             homeScreenContainer.style.display = 'none';
         }
+
+        backgroundAudio.play().then(() => {
+            backgroundAudio.muted = false; // Unmute after starting playback
+        }).catch(error => {
+            console.log('Autoplay failed:', error);
+        });
 
         document.getElementById('startButton').addEventListener('click', function () {
             const name = document.getElementById('name').value.trim();
