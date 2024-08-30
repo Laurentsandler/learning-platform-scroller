@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Learning Platform</title>
     <style>
+        /* Your existing styles */
         body, html {
             margin: 0;
             padding: 0;
@@ -58,7 +59,7 @@
             position: absolute;
             top: 10px;
             left: 10px;
-            display: none; /* Hide initially */
+            display: none;
         }
 
         input {
@@ -136,7 +137,7 @@
 </head>
 <body>
 
-<audio id="backgroundAudio" muted>
+<audio id="backgroundAudio">
     <source src="https://audio.com/laurent-sandler/audio/mp4-to-mp3-conversion-result" type="audio/mp3">
     Your browser does not support the audio element.
 </audio>
@@ -186,12 +187,6 @@
             homeScreenContainer.style.display = 'none';
         }
 
-        backgroundAudio.play().then(() => {
-            backgroundAudio.muted = false; // Unmute after starting playback
-        }).catch(error => {
-            console.log('Autoplay failed:', error);
-        });
-
         document.getElementById('startButton').addEventListener('click', function () {
             const name = document.getElementById('name').value.trim();
             const grade = parseInt(document.getElementById('grade').value.trim());
@@ -209,6 +204,11 @@
                 greetingText.style.display = 'block'; // Show only on the home screen
                 welcomeContainer.style.display = 'none';
                 homeScreenContainer.style.display = 'block';
+
+                // Start playing audio after the user clicks the button
+                backgroundAudio.play().catch(error => {
+                    console.log('Autoplay failed:', error);
+                });
             } else {
                 alert('Please enter both your name and grade.');
             }
