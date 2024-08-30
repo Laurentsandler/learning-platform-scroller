@@ -58,6 +58,7 @@
             position: absolute;
             top: 10px;
             left: 10px;
+            display: none; /* Hide initially */
         }
 
         input {
@@ -170,10 +171,11 @@
 
         if (userData) {
             greetingText.textContent = `${getGreeting()}, ${userData.name}!`;
+            greetingText.style.display = 'block'; // Show only on the home screen
             welcomeContainer.style.display = 'none';
             homeScreenContainer.style.display = 'block';
         } else {
-            greetingText.textContent = `${getGreeting()}!`;
+            greetingText.style.display = 'none'; // Hide on the welcome screen
             welcomeContainer.style.display = 'block';
             homeScreenContainer.style.display = 'none';
         }
@@ -192,6 +194,7 @@
                 alert('Welcome, ' + name + '! Your grade is saved.');
 
                 greetingText.textContent = `${getGreeting()}, ${userData.name}!`;
+                greetingText.style.display = 'block'; // Show only on the home screen
                 welcomeContainer.style.display = 'none';
                 homeScreenContainer.style.display = 'block';
             } else {
