@@ -5,226 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Learning Platform</title>
     <style>
-        /* Your existing styles */
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            font-family: 'Roboto', sans-serif;
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        body::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 25% 25%, #ff7f50, transparent, transparent),
-                        radial-gradient(circle at 75% 25%, #6495ed, transparent, transparent),
-                        radial-gradient(circle at 25% 75%, #ff69b4, transparent, transparent),
-                        radial-gradient(circle at 75% 75%, #ba55d3, transparent, transparent);
-            background-size: 200% 200%;
-            animation: backgroundShift 15s infinite linear;
-            z-index: -1;
-        }
-
-        @keyframes backgroundShift {
-            0% {
-                background-position: 0% 0%;
-            }
-            50% {
-                background-position: 100% 100%;
-            }
-            100% {
-                background-position: 0% 0%;
-            }
-        }
-
-        .container {
-            width: 90%;
-            max-width: 400px;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .greeting {
-            font-size: 28px;
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            display: none;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border-radius: 8px;
-            border: none;
-            font-size: 16px;
-            background-color: #fff;
-            color: #333;
-        }
-
-        input:focus {
-            outline: none;
-            box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            background-color: #6c63ff;
-            color: #fff;
-            font-size: 18px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        button:hover {
-            background-color: #5a54e7;
-        }
-
-        button:active {
-            background-color: #4e4ac9;
-        }
-
-        .subject-button {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 8px;
-            background-color: #6c63ff;
-            color: #fff;
-            font-size: 18px;
-            cursor: pointer;
-            transition: transform 0.3s ease, background-color 0.3s ease;
-        }
-
-        .subject-button:hover {
-            background-color: #5a54e7;
-            transform: scale(1.05);
-        }
-
-        .subject-button:active {
-            background-color: #4e4ac9;
-            transform: scale(1);
-        }
-
-        @keyframes bounce {
-            0%, 100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.1);
-            }
-        }
-
-        .subject-button.clicked {
-            animation: bounce 0.5s ease-in-out;
-        }
+        /* Your existing styles here */
     </style>
 </head>
 <body>
 
-<audio id="backgroundAudio">
-    <source src="https://audio.com/laurent-sandler/audio/mp4-to-mp3-conversion-result" type="audio/mp3">
+<!-- Your existing HTML content -->
+
+<audio id="backgroundMusic" autoplay>
+    <source src="https://audio.com/embed/audio/1808758412671862?theme=image" type="audio/mp3">
     Your browser does not support the audio element.
 </audio>
 
-<div class="greeting" id="greetingText"></div>
-
-<div class="container" id="welcomeContainer">
-    <input type="text" id="name" placeholder="Enter your name" required>
-    <input type="number" id="grade" placeholder="Enter your current grade" required>
-    <button id="startButton">Get Started</button>
-</div>
-
-<div class="container" id="homeScreenContainer" style="display: none;">
-    <button class="subject-button" onclick="handleSubjectClick('Math')">Math</button>
-    <button class="subject-button" onclick="handleSubjectClick('Science')">Science</button>
-    <button class="subject-button" onclick="handleSubjectClick('History')">History</button>
-    <button class="subject-button" onclick="handleSubjectClick('English')">English</button>
-</div>
-
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const userData = JSON.parse(localStorage.getItem('userData'));
-        const greetingText = document.getElementById('greetingText');
-        const welcomeContainer = document.getElementById('welcomeContainer');
-        const homeScreenContainer = document.getElementById('homeScreenContainer');
-        const backgroundAudio = document.getElementById('backgroundAudio');
-
-        function getGreeting() {
-            const hour = new Date().getHours();
-            if (hour < 12) {
-                return 'Good morning';
-            } else if (hour < 18) {
-                return 'Good afternoon';
-            } else {
-                return 'Good evening';
-            }
-        }
-
-        if (userData) {
-            greetingText.textContent = `${getGreeting()}, ${userData.name}!`;
-            greetingText.style.display = 'block'; // Show only on the home screen
-            welcomeContainer.style.display = 'none';
-            homeScreenContainer.style.display = 'block';
-        } else {
-            greetingText.style.display = 'none'; // Hide on the welcome screen
-            welcomeContainer.style.display = 'block';
-            homeScreenContainer.style.display = 'none';
-        }
-
-        document.getElementById('startButton').addEventListener('click', function () {
-            const name = document.getElementById('name').value.trim();
-            const grade = parseInt(document.getElementById('grade').value.trim());
-
-            if (name && grade) {
-                const userData = {
-                    name: name,
-                    grade: grade,
-                    lastUpdated: new Date().getFullYear()
-                };
-                localStorage.setItem('userData', JSON.stringify(userData));
-                alert('Welcome, ' + name + '! Your grade is saved.');
-
-                greetingText.textContent = `${getGreeting()}, ${userData.name}!`;
-                greetingText.style.display = 'block'; // Show only on the home screen
-                welcomeContainer.style.display = 'none';
-                homeScreenContainer.style.display = 'block';
-
-                // Start playing audio after the user clicks the button
-                backgroundAudio.play().catch(error => {
-                    console.log('Autoplay failed:', error);
-                });
-            } else {
-                alert('Please enter both your name and grade.');
-            }
+        const music = document.getElementById('backgroundMusic');
+        music.play().catch(() => {
+            // Autoplay was prevented, add controls to allow user to play the audio
+            music.setAttribute('controls', 'controls');
         });
     });
-
-    function handleSubjectClick(subject) {
-        const buttons = document.querySelectorAll('.subject-button');
-        buttons.forEach(button => button.classList.remove('clicked'));
-        const clickedButton = Array.from(buttons).find(button => button.textContent === subject);
-        clickedButton.classList.add('clicked');
-
-        setTimeout(() => {
-            alert(`Navigating to ${subject}...`); // Replace this with actual navigation logic
-        }, 500);
-    }
 </script>
 
 </body>
