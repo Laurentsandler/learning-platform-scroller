@@ -12,18 +12,30 @@
 
 <!-- Your existing HTML content -->
 
-<audio id="backgroundMusic" autoplay loop>
+<audio id="backgroundMusic" loop>
     <source src="https://drive.google.com/uc?export=download&id=1XuWiWde3DwgaP4JC92eZFiypjSqejJpV" type="audio/mp3">
     Your browser does not support the audio element.
 </audio>
 
+<button id="playMusicButton" style="display: none;">Play Music</button>
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const music = document.getElementById('backgroundMusic');
-        music.play().catch(() => {
-            // Autoplay was prevented, add controls to allow the user to play the audio
-            music.setAttribute('controls', 'controls');
-        });
+        const playMusicButton = document.getElementById('playMusicButton');
+
+        function playMusic() {
+            music.play().catch(() => {
+                // If autoplay is prevented, show the button to allow user to play the audio manually
+                playMusicButton.style.display = 'block';
+                playMusicButton.addEventListener('click', function () {
+                    music.play();
+                    playMusicButton.style.display = 'none';
+                });
+            });
+        }
+
+        playMusic();
     });
 </script>
 
