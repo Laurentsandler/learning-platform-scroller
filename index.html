@@ -16,22 +16,12 @@
             display: flex;
             justify-content: center;
             align-items: center;
-        }
-
-        body::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
             background: radial-gradient(circle at 25% 25%, #ff7f50, transparent, transparent),
                         radial-gradient(circle at 75% 25%, #6495ed, transparent, transparent),
                         radial-gradient(circle at 25% 75%, #ff69b4, transparent, transparent),
                         radial-gradient(circle at 75% 75%, #ba55d3, transparent, transparent);
             background-size: 200% 200%;
             animation: backgroundShift 15s infinite linear;
-            z-index: -1;
         }
 
         @keyframes backgroundShift {
@@ -58,10 +48,10 @@
             position: absolute;
             top: 10px;
             left: 10px;
-            display: none; /* Hide initially */
+            display: none;
         }
 
-        input {
+        input, button {
             width: 100%;
             padding: 12px;
             margin: 10px 0;
@@ -70,18 +60,16 @@
             font-size: 16px;
             background-color: #fff;
             color: #333;
+            opacity: 1;
+            transition: opacity 0.5s ease;
         }
 
-        input:focus {
+        input:focus, button:focus {
             outline: none;
             box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
         }
 
         button {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
             background-color: #6c63ff;
             color: #fff;
             font-size: 18px;
@@ -98,7 +86,8 @@
         }
 
         .subject-button {
-            width: 100%;
+            display: none;
+            opacity: 0;
             padding: 12px;
             margin: 10px 0;
             border: none;
@@ -120,17 +109,52 @@
             transform: scale(1);
         }
 
-        @keyframes bounce {
-            0%, 100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.1);
+        .glowing-circle {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            box-shadow: 0 0 50px rgba(255, 255, 255, 0.5);
+            left: calc(50% - 50px);
+            top: calc(50% - 50px);
+            opacity: 0;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        @keyframes suckIn {
+            to {
+                transform: scale(0);
+                opacity: 0;
             }
         }
 
-        .subject-button.clicked {
-            animation: bounce 0.5s ease-in-out;
+        @keyframes explode {
+            0% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .explosion-text {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 36px;
+            text-align: center;
+            animation: explode 1s ease forwards;
+        }
+
+        .subtext {
+            font-size: 16px;
+            margin-top: 10px;
+            animation: explode 1s ease forwards;
         }
     </style>
 </head>
@@ -151,104 +175,88 @@
     <button class="subject-button" onclick="handleSubjectClick('English')">English</button>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const userData = JSON.parse(localStorage.getItem('userData'));
-        const greetingText = document.getElementById('greetingText');
-        const welcomeContainer = document.getElementById('welcomeContainer');
-        const homeScreenContainer = document.getElementById('homeScreenContainer');
-
-        function getGreeting() {
-            const hour = new Date().getHours();
-            if (hour < 12) {
-                return 'Good morning';
-            } else if (hour < 18) {
-                return 'Good afternoon';
-            } else {
-                return 'Good evening';
-            }
-        }
-
-        if (userData) {
-            greetingText.textContent = `${getGreeting()}, ${userData.name}!`;
-            greetingText.style.display = 'block'; // Show only on the home screen
-            welcomeContainer.style.display = 'none';
-            homeScreenContainer.style.display = 'block';
-        } else {
-            greetingText.style.display = 'none'; // Hide on the welcome screen
-            welcomeContainer.style.display = 'block';
-            homeScreenContainer.style.display = 'none';
-        }
-
-        document.getElementById('startButton').addEventListener('click', function () {
-            const name = document.getElementById('name').value.trim();
-            const grade = parseInt(document.getElementById('grade').value.trim());
-
-            if (name && grade) {
-                const userData = {
-                    name: name,
-                    grade: grade,
-                    lastUpdated: new Date().getFullYear()
-                };
-                localStorage.setItem('userData', JSON.stringify(userData));
-                alert('Welcome, ' + name + '! Your grade is saved.');
-
-                greetingText.textContent = `${getGreeting()}, ${userData.name}!`;
-                greetingText.style.display = 'block'; // Show only on the home screen
-                welcomeContainer.style.display = 'none';
-                homeScreenContainer.style.display = 'block';
-            } else {
-                alert('Please enter both your name and grade.');
-            }
-        });
-    });
-
-    function handleSubjectClick(subject) {
-        const buttons = document.querySelectorAll('.subject-button');
-        buttons.forEach(button => button.classList.remove('clicked'));
-        const clickedButton = Array.from(buttons).find(button => button.textContent === subject);
-        clickedButton.classList.add('clicked');
-
-        setTimeout(() => {
-            alert(`Navigating to ${subject}...`); // Replace this with actual navigation logic
-        }, 500);
-    }
-</script>
-
-
-
-<audio id="backgroundMusic" >
-    <source src="https://x5xyx35pwx90vl1i.public.blob.vercel-storage.com/MP4%20to%20MP3%20conversion%20result-NV6sLvybasSQqBff7eQ2sC4joBfR6n.mp3" type="audio/mp3">
-    Your browser does not support the audio element.
-</audio>
-
+<div class="glowing-circle" id="glowingCircle"></div>
+<div class="explosion-text" id="explosionText">
+    Welcome to Learning Platform!
+    <div class="subtext">Your journey starts here.</div>
+</div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const music = document.getElementById('backgroundMusic');
         const startButton = document.getElementById('startButton');
+        const welcomeContainer = document.getElementById('welcomeContainer');
+        const homeScreenContainer = document.getElementById('homeScreenContainer');
+        const glowingCircle = document.getElementById('glowingCircle');
+        const explosionText = document.getElementById('explosionText');
+        const subjectButtons = document.querySelectorAll('.subject-button');
 
+        startButton.addEventListener('click', function () {
+            // Hide the current UI elements by sucking them into the glowing circle
+            welcomeContainer.style.opacity = '0';
+            setTimeout(() => {
+                glowingCircle.style.opacity = '1';
+                glowingCircle.style.transform = 'scale(10)';
+            }, 500); // delay to start the sucking effect
+
+            setTimeout(() => {
+                glowingCircle.style.animation = 'suckIn 1s forwards';
+            }, 1000);
+
+            setTimeout(() => {
+                glowingCircle.style.display = 'none';
+                explosionText.style.display = 'block';
+            }, 2000);
+
+            // Display text explosion with subtext
+            setTimeout(() => {
+                explosionText.style.opacity = '1';
+                explosionText.style.transform = 'scale(1)';
+            }, 5000); // Text appears after 5 seconds
+
+            // Show the home screen UI elements
+            setTimeout(() => {
+                explosionText.style.opacity = '0';
+                explosionText.style.display = 'none';
+                homeScreenContainer.style.display = 'block';
+                subjectButtons.forEach(button => {
+                    button.style.display = 'block';
+                    setTimeout(() => {
+                        button.style.opacity = '1';
+                    }, 18000); // Elements lower into place after 18 seconds
+                });
+            }, 18000);
+        });
+
+        function handleSubjectClick(subject) {
+            const buttons = document.querySelectorAll('.subject-button');
+            buttons.forEach(button => button.classList.remove('clicked'));
+            const clickedButton = Array.from(buttons).find(button => button.textContent === subject);
+            clickedButton.classList.add('clicked');
+
+            setTimeout(() => {
+                alert(`Navigating to ${subject}...`);
+            }, 500);
+        }
+
+        // Play background music
         function playMusic() {
-             music.play().catch(() => {
-                // If autoplay is prevented, show the button to allow user to play the audio manually
+            music.play().catch(() => {
                 startButton.style.display = 'block';
                 startButton.addEventListener('click', function () {
                     music.play();
-                  
                 });
-             });
+            });
         }
-
+        
         playMusic();
     });
 </script>
 
+<audio id="backgroundMusic" loop>
+    <source src="https://x5xyx35pwx90vl1i.public.blob.vercel-storage.com/MP4%20to%20MP3%20conversion%20result-NV6sLvybasSQqBff7eQ2sC4joBfR6n.mp3" type="audio/mp3">
+    Your browser does not support the audio element.
+</audio>
 
-
-
-
-
-
-    
 </body>
 </html>
