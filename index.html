@@ -25,15 +25,9 @@
         }
 
         @keyframes backgroundShift {
-            0% {
-                background-position: 0% 0%;
-            }
-            50% {
-                background-position: 100% 100%;
-            }
-            100% {
-                background-position: 0% 0%;
-            }
+            0% { background-position: 0% 0%; }
+            50% { background-position: 100% 100%; }
+            100% { background-position: 0% 0%; }
         }
 
         .container {
@@ -41,17 +35,29 @@
             max-width: 400px;
             padding: 20px;
             text-align: center;
+            transition: transform 3s ease-in-out, opacity 2s ease-in-out;
         }
 
-        .greeting {
-            font-size: 28px;
+        .circle {
             position: absolute;
-            top: 10px;
-            left: 10px;
-            display: none;
+            width: 0;
+            height: 0;
+            background-color: #ffffff;
+            border-radius: 50%;
+            z-index: 10;
+            transition: width 2s ease, height 2s ease, opacity 2s ease;
         }
 
-        input, button {
+        .explosion {
+            display: none;
+            font-size: 36px;
+            text-align: center;
+            z-index: 11;
+            opacity: 0;
+            transition: opacity 3s ease-in-out;
+        }
+
+        input {
             width: 100%;
             padding: 12px;
             margin: 10px 0;
@@ -60,16 +66,18 @@
             font-size: 16px;
             background-color: #fff;
             color: #333;
-            opacity: 1;
-            transition: opacity 0.5s ease;
         }
 
-        input:focus, button:focus {
+        input:focus {
             outline: none;
             box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
         }
 
         button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
             background-color: #6c63ff;
             color: #fff;
             font-size: 18px;
@@ -86,8 +94,7 @@
         }
 
         .subject-button {
-            display: none;
-            opacity: 0;
+            width: 100%;
             padding: 12px;
             margin: 10px 0;
             border: none;
@@ -97,6 +104,8 @@
             font-size: 18px;
             cursor: pointer;
             transition: transform 0.3s ease, background-color 0.3s ease;
+            opacity: 0;
+            transform: translateY(100px);
         }
 
         .subject-button:hover {
@@ -109,63 +118,25 @@
             transform: scale(1);
         }
 
-        .glowing-circle {
-            position: absolute;
-            width: 100px;
-            height: 100px;
-            background: rgba(255, 255, 255, 0.7);
-            border-radius: 50%;
-            box-shadow: 0 0 50px rgba(255, 255, 255, 0.5);
-            left: calc(50% - 50px);
-            top: calc(50% - 50px);
-            opacity: 0;
-            transition: opacity 0.5s ease, transform 0.5s ease;
-        }
-
-        @keyframes suckIn {
-            to {
-                transform: scale(0);
-                opacity: 0;
-            }
-        }
-
-        @keyframes explode {
-            0% {
-                opacity: 0;
-                transform: scale(0.5);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        .explosion-text {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 36px;
-            text-align: center;
-            animation: explode 1s ease forwards;
-        }
-
-        .subtext {
-            font-size: 16px;
-            margin-top: 10px;
-            animation: explode 1s ease forwards;
+        @keyframes lowerButtons {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
     </style>
 </head>
 <body>
 
-<div class="greeting" id="greetingText"></div>
-
 <div class="container" id="welcomeContainer">
     <input type="text" id="name" placeholder="Enter your name" required>
     <input type="number" id="grade" placeholder="Enter your current grade" required>
     <button id="startButton">Get Started</button>
+</div>
+
+<div class="circle" id="suckCircle"></div>
+
+<div class="explosion" id="explosionText">
+    <p>Welcome to Scaller</p>
+    <p>Next-gen engaging learning powered by AI</p>
 </div>
 
 <div class="container" id="homeScreenContainer" style="display: none;">
@@ -175,88 +146,53 @@
     <button class="subject-button" onclick="handleSubjectClick('English')">English</button>
 </div>
 
-<div class="glowing-circle" id="glowingCircle"></div>
-<div class="explosion-text" id="explosionText">
-    Welcome to Learning Platform!
-    <div class="subtext">Your journey starts here.</div>
-</div>
-
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const music = document.getElementById('backgroundMusic');
-        const startButton = document.getElementById('startButton');
+    document.getElementById('startButton').addEventListener('click', function () {
         const welcomeContainer = document.getElementById('welcomeContainer');
-        const homeScreenContainer = document.getElementById('homeScreenContainer');
-        const glowingCircle = document.getElementById('glowingCircle');
+        const circle = document.getElementById('suckCircle');
         const explosionText = document.getElementById('explosionText');
-        const subjectButtons = document.querySelectorAll('.subject-button');
+        const homeScreenContainer = document.getElementById('homeScreenContainer');
 
-        startButton.addEventListener('click', function () {
-            // Hide the current UI elements by sucking them into the glowing circle
-            welcomeContainer.style.opacity = '0';
-            setTimeout(() => {
-                glowingCircle.style.opacity = '1';
-                glowingCircle.style.transform = 'scale(10)';
-            }, 500); // delay to start the sucking effect
+        // UI elements appear to be sucked into the circle
+        welcomeContainer.style.transform = 'scale(0.5)';
+        welcomeContainer.style.opacity = '0';
 
-            setTimeout(() => {
-                glowingCircle.style.animation = 'suckIn 1s forwards';
-            }, 1000);
+        setTimeout(() => {
+            circle.style.width = '100px';
+            circle.style.height = '100px';
+        }, 1000);
 
-            setTimeout(() => {
-                glowingCircle.style.display = 'none';
-                explosionText.style.display = 'block';
-            }, 2000);
+        setTimeout(() => {
+            circle.style.width = '0';
+            circle.style.height = '0';
+            explosionText.style.display = 'block';
+            explosionText.style.opacity = '1';
+        }, 4000);
 
-            // Display text explosion with subtext
-            setTimeout(() => {
-                explosionText.style.opacity = '1';
-                explosionText.style.transform = 'scale(1)';
-            }, 5000); // Text appears after 5 seconds
-
-            // Show the home screen UI elements
-            setTimeout(() => {
-                explosionText.style.opacity = '0';
-                explosionText.style.display = 'none';
-                homeScreenContainer.style.display = 'block';
-                subjectButtons.forEach(button => {
-                    button.style.display = 'block';
-                    setTimeout(() => {
-                        button.style.opacity = '1';
-                    }, 18000); // Elements lower into place after 18 seconds
-                });
-            }, 18000);
-        });
-
-        function handleSubjectClick(subject) {
-            const buttons = document.querySelectorAll('.subject-button');
-            buttons.forEach(button => button.classList.remove('clicked'));
-            const clickedButton = Array.from(buttons).find(button => button.textContent === subject);
-            clickedButton.classList.add('clicked');
-
-            setTimeout(() => {
-                alert(`Navigating to ${subject}...`);
-            }, 500);
-        }
-
-        // Play background music
-        function playMusic() {
-            music.play().catch(() => {
-                startButton.style.display = 'block';
-                startButton.addEventListener('click', function () {
-                    music.play();
-                });
+        // Transition to home screen UI elements lowering down
+        setTimeout(() => {
+            explosionText.style.opacity = '0';
+            homeScreenContainer.style.display = 'block';
+            const buttons = homeScreenContainer.querySelectorAll('.subject-button');
+            buttons.forEach((button, index) => {
+                setTimeout(() => {
+                    button.style.animation = 'lowerButtons 3s forwards';
+                }, index * 200);
             });
-        }
-        
-        playMusic();
+        }, 18000);
     });
-</script>
 
-<audio id="backgroundMusic" >
-    <source src="https://x5xyx35pwx90vl1i.public.blob.vercel-storage.com/MP4%20to%20MP3%20conversion%20result-NV6sLvybasSQqBff7eQ2sC4joBfR6n.mp3" type="audio/mp3">
-    Your browser does not support the audio element.
-</audio>
+    function handleSubjectClick(subject) {
+        const buttons = document.querySelectorAll('.subject-button');
+        buttons.forEach(button => button.classList.remove('clicked'));
+        const clickedButton = Array.from(buttons).find(button => button.textContent === subject);
+        clickedButton.classList.add('clicked');
+
+        setTimeout(() => {
+            alert(`Navigating to ${subject}...`);
+        }, 500);
+    }
+</script>
 
 </body>
 </html>
