@@ -34,7 +34,7 @@
         }
 
         /* Animation to be added only when needed */
-        .background-animate {
+        .background-animate::before {
             animation: backgroundShift 15s infinite linear;
         }
 
@@ -178,12 +178,16 @@
             }
         }
 
-        if (userData) {
+        function navigateToHomeScreen() {
             greetingText.textContent = `${getGreeting()}, ${userData.name}!`;
             greetingText.style.display = 'block'; // Show only on the home screen
             welcomeContainer.style.display = 'none';
             homeScreenContainer.style.display = 'block';
             document.body.classList.add('background-animate'); // Start animation
+        }
+
+        if (userData) {
+            navigateToHomeScreen(); // If user data exists, navigate to the home screen
         } else {
             greetingText.style.display = 'none'; // Hide on the welcome screen
             welcomeContainer.style.display = 'block';
@@ -203,11 +207,7 @@
                 localStorage.setItem('userData', JSON.stringify(userData));
                 alert('Welcome, ' + name + '! Your grade is saved.');
 
-                greetingText.textContent = `${getGreeting()}, ${userData.name}!`;
-                greetingText.style.display = 'block'; // Show only on the home screen
-                welcomeContainer.style.display = 'none';
-                homeScreenContainer.style.display = 'block';
-                document.body.classList.add('background-animate'); // Start animation when navigating to home screen
+                navigateToHomeScreen(); // Navigate to the home screen after user signs in
             } else {
                 alert('Please enter both your name and grade.');
             }
