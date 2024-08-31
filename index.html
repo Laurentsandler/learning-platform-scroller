@@ -33,7 +33,7 @@
             z-index: -1;
         }
 
-        /* Animation to be added later */
+        /* Animation to be added only when needed */
         .background-animate {
             animation: backgroundShift 15s infinite linear;
         }
@@ -183,7 +183,7 @@
             greetingText.style.display = 'block'; // Show only on the home screen
             welcomeContainer.style.display = 'none';
             homeScreenContainer.style.display = 'block';
-            document.body.classList.add('background-animate'); // Add the animation after the user is known
+            document.body.classList.add('background-animate'); // Start animation
         } else {
             greetingText.style.display = 'none'; // Hide on the welcome screen
             welcomeContainer.style.display = 'block';
@@ -207,7 +207,7 @@
                 greetingText.style.display = 'block'; // Show only on the home screen
                 welcomeContainer.style.display = 'none';
                 homeScreenContainer.style.display = 'block';
-                document.body.classList.add('background-animate'); // Add the animation after the user is known
+                document.body.classList.add('background-animate'); // Start animation when navigating to home screen
             } else {
                 alert('Please enter both your name and grade.');
             }
