@@ -57,6 +57,14 @@
             transition: opacity 3s ease-in-out;
         }
 
+        .greeting {
+            font-size: 28px;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            text-align: center;
+        }
+
         input {
             width: 100%;
             padding: 12px;
@@ -126,6 +134,8 @@
 </head>
 <body>
 
+<div class="greeting" id="greetingText"></div>
+
 <div class="container" id="welcomeContainer">
     <input type="text" id="name" placeholder="Enter your name" required>
     <input type="number" id="grade" placeholder="Enter your current grade" required>
@@ -146,40 +156,96 @@
     <button class="subject-button" onclick="handleSubjectClick('English')">English</button>
 </div>
 
+<audio id="backgroundMusic" loop>
+    <source src="https://x5xyx35pwx90vl1i.public.blob.vercel-storage.com/MP4%20to%20MP3%20conversion%20result-NV6sLvybasSQqBff7eQ2sC4joBfR6n.mp3" type="audio/mp3">
+    Your browser does not support the audio element.
+</audio>
+
 <script>
-    document.getElementById('startButton').addEventListener('click', function () {
+    document.addEventListener('DOMContentLoaded', function () {
+        const music = document.getElementById('backgroundMusic');
+        const startButton = document.getElementById('startButton');
+
+        function playMusic() {
+            music.play().catch(() => {
+                startButton.addEventListener('click', function () {
+                    music.play();
+                });
+            });
+        }
+
+        playMusic();
+
+        const userData = JSON.parse(localStorage.getItem('userData'));
+        const greetingText = document.getElementById('greetingText');
         const welcomeContainer = document.getElementById('welcomeContainer');
-        const circle = document.getElementById('suckCircle');
-        const explosionText = document.getElementById('explosionText');
         const homeScreenContainer = document.getElementById('homeScreenContainer');
 
-        // UI elements appear to be sucked into the circle
-        welcomeContainer.style.transform = 'scale(0.5)';
-        welcomeContainer.style.opacity = '0';
+        function getGreeting() {
+            const hour = new Date().getHours();
+            if (hour < 12) {
+                return 'Good morning';
+            } else if (hour < 18) {
+                return 'Good afternoon';
+            } else {
+                return 'Good evening';
+            }
+        }
 
-        setTimeout(() => {
-            circle.style.width = '100px';
-            circle.style.height = '100px';
-        }, 1000);
-
-        setTimeout(() => {
-            circle.style.width = '0';
-            circle.style.height = '0';
-            explosionText.style.display = 'block';
-            explosionText.style.opacity = '1';
-        }, 4000);
-
-        // Transition to home screen UI elements lowering down
-        setTimeout(() => {
-            explosionText.style.opacity = '0';
+        if (userData) {
+            greetingText.textContent = `${getGreeting()}, ${userData.name}!`;
+            greetingText.style.display = 'block';
+            welcomeContainer.style.display = 'none';
             homeScreenContainer.style.display = 'block';
-            const buttons = homeScreenContainer.querySelectorAll('.subject-button');
-            buttons.forEach((button, index) => {
+        } else {
+            greetingText.style.display = 'none';
+            welcomeContainer.style.display = 'block';
+            homeScreenContainer.style.display = 'none';
+        }
+
+        document.getElementById('startButton').addEventListener('click', function () {
+            const name = document.getElementById('name').value.trim();
+            const grade = parseInt(document.getElementById('grade').value.trim());
+
+            if (name && grade) {
+                const userData = {
+                    name: name,
+                    grade: grade,
+                    lastUpdated: new Date().getFullYear()
+                };
+                localStorage.setItem('userData', JSON.stringify(userData));
+
+                greetingText.textContent = `${getGreeting()}, ${userData.name}!`;
+                greetingText.style.display = 'block';
+                welcomeContainer.style.transform = 'scale(0.5)';
+                welcomeContainer.style.opacity = '0';
+
                 setTimeout(() => {
-                    button.style.animation = 'lowerButtons 3s forwards';
-                }, index * 200);
-            });
-        }, 18000);
+                    document.getElementById('suckCircle').style.width = '100px';
+                    document.getElementById('suckCircle').style.height = '100px';
+                }, 1000);
+
+                setTimeout(() => {
+                    document.getElementById('suckCircle').style.width = '0';
+                    document.getElementById('suckCircle').style.height = '0';
+                    document.getElementById('explosionText').style.display = 'block';
+                    document.getElementById('explosionText').style.opacity = '1';
+                }, 4000);
+
+                setTimeout(() => {
+                    document.getElementById('explosionText').style.opacity = '0';
+                    homeScreenContainer.style.display = 'block';
+                    const buttons = homeScreenContainer.querySelectorAll('.subject-button');
+                    buttons.forEach((button, index) => {
+                        setTimeout(() => {
+                            button.style.animation = 'lowerButtons 3s forwards';
+                        }, index * 200);
+                    });
+                }, 18000);
+            } else {
+                alert('Please enter both your name and grade.');
+            }
+        });
     });
 
     function handleSubjectClick(subject) {
