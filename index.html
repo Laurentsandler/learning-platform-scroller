@@ -30,8 +30,12 @@
                         radial-gradient(circle at 25% 75%, #ff69b4, transparent, transparent),
                         radial-gradient(circle at 75% 75%, #ba55d3, transparent, transparent);
             background-size: 200% 200%;
-            animation: backgroundShift 15s infinite linear;
             z-index: -1;
+        }
+
+        /* Animation to be added later */
+        .background-animate {
+            animation: backgroundShift 15s infinite linear;
         }
 
         @keyframes backgroundShift {
@@ -73,7 +77,6 @@
             color: #fff;
             transition: background-color 0.3s ease;
         }
-
 
         input {
             width: 90%;
@@ -144,11 +147,7 @@
 
 <div class="greeting" id="greetingText"></div>
 
-<div class="container" id="welcomeContainer">
-    <input type="text" id="name" placeholder="Enter your name" required>
-    <input type="number" id="grade" placeholder="Enter your current grade" required>
-    <button id="startButton">Get Started</button>
-</div>
+
 
 <div class="container" id="homeScreenContainer" style="display: none;">
     <button class="subject-button" onclick="handleSubjectClick('Math')">Math</button>
@@ -180,6 +179,7 @@
             greetingText.style.display = 'block'; // Show only on the home screen
             welcomeContainer.style.display = 'none';
             homeScreenContainer.style.display = 'block';
+            document.body.classList.add('background-animate'); // Add the animation after the user is known
         } else {
             greetingText.style.display = 'none'; // Hide on the welcome screen
             welcomeContainer.style.display = 'block';
@@ -203,6 +203,7 @@
                 greetingText.style.display = 'block'; // Show only on the home screen
                 welcomeContainer.style.display = 'none';
                 homeScreenContainer.style.display = 'block';
+                document.body.classList.add('background-animate'); // Add the animation after the user is known
             } else {
                 alert('Please enter both your name and grade.');
             }
