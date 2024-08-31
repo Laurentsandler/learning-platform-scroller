@@ -199,14 +199,15 @@
             const grade = parseInt(document.getElementById('grade').value.trim());
 
             if (name && grade) {
-                const userData = {
+                const newUserData = {
                     name: name,
                     grade: grade,
                     lastUpdated: new Date().getFullYear()
                 };
-                localStorage.setItem('userData', JSON.stringify(userData));
-                alert('Welcome, ' + name + '! Your grade is saved.');
+                localStorage.setItem('userData', JSON.stringify(newUserData));
+                userData = newUserData; // Update userData to reflect the newly saved data
 
+                alert('Welcome, ' + name + '! Your grade is saved.');
                 navigateToHomeScreen(); // Navigate to the home screen after user signs in
             } else {
                 alert('Please enter both your name and grade.');
