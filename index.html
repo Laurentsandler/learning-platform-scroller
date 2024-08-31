@@ -47,10 +47,10 @@
             position: absolute;
             top: 10px;
             left: 10px;
-            display: none; /* Hide initially */
+            display: none;
         }
 
-        button, input {
+        button  {
             width: 100%;
             padding: 12px;
             margin: 10px 0;
@@ -58,6 +58,19 @@
             border: none;
             font-size: 18px;
             cursor: pointer;
+        }
+
+         input {
+            width: 90%;
+            padding: 12px;
+            margin: 10px  0;
+            border-radius: 8px;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #6c63ff;
+            color: #fff;
+            transition: background-color 0.3s ease;
         }
 
         button {
@@ -126,13 +139,15 @@
             height: 100%;
             object-fit: cover;
             z-index: 1;
-            display: none; /* Hide video initially */
+            display: none;
+            pointer-events: none;
+            background-color: black;
         }
     </style>
 </head>
 <body>
 
-<video id="introVideo" src="https://x5xyx35pwx90vl1i.public.blob.vercel-storage.com/Next%20video%201060x1920-xfdzSpjJsSPGyT2jZpP26cxhGkBgjz.mp4"></video>
+<video id="introVideo" src="https://x5xyx35pwx90vl1i.public.blob.vercel-storage.com/Next%20video%201060x1920-xfdzSpjJsSPGyT2jZpP26cxhGkBgjz.mp4" playsinline muted></video>
 
 <div class="greeting" id="greetingText"></div>
 
@@ -174,7 +189,7 @@
             greetingText.style.display = 'block';
             welcomeContainer.style.display = 'none';
             homeScreenContainer.style.display = 'block';
-            body.style.animation = "backgroundShift 15s infinite linear"; // Start moving background on home screen
+            body.style.animation = "backgroundShift 15s infinite linear";
         } else {
             greetingText.style.display = 'none';
             welcomeContainer.style.display = 'block';
@@ -194,16 +209,16 @@
                 localStorage.setItem('userData', JSON.stringify(userData));
                 alert('Welcome, ' + name + '! Your grade is saved.');
 
-                introVideo.style.display = 'block'; // Show video
-                introVideo.play(); // Play video
+                introVideo.style.display = 'block';
+                introVideo.play();
 
                 introVideo.onended = function () {
-                    introVideo.style.display = 'none'; // Hide video when done
+                    introVideo.style.display = 'none';
                     greetingText.textContent = `${getGreeting()}, ${userData.name}!`;
                     greetingText.style.display = 'block';
                     welcomeContainer.style.display = 'none';
                     homeScreenContainer.style.display = 'block';
-                    body.style.animation = "backgroundShift 15s infinite linear"; // Start moving background
+                    body.style.animation = "backgroundShift 15s infinite linear";
                 };
             } else {
                 alert('Please enter both your name and grade.');
@@ -218,7 +233,7 @@
         clickedButton.classList.add('clicked');
 
         setTimeout(() => {
-            alert(`Navigating to ${subject}...`); // Replace this with actual navigation logic
+            alert(`Navigating to ${subject}...`);
         }, 500);
     }
 </script>
