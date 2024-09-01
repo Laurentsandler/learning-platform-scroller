@@ -144,7 +144,7 @@
 </head>
 <body>
 
-<video id="introVideo" src="https://x5xyx35pwx90vl1i.public.blob.vercel-storage.com/Next%20video%201060x1920-xfdzSpjJsSPGyT2jZpP26cxhGkBgjz.mp4" playsinline></video>
+<video id="introVideo" playsinline></video>
 
 <div class="greeting" id="greetingText"></div>
 
@@ -181,6 +181,15 @@
             }
         }
 
+        function setVideoSource() {
+            const isLandscape = window.innerWidth > window.innerHeight;
+            if (isLandscape) {
+                introVideo.src = "https://x5xyx35pwx90vl1i.public.blob.vercel-storage.com/Next%20Video%201060x1920%20(1)-yztE6k7edMgHAYoAJR6Ti4o799X1DF.mp4";
+            } else {
+                introVideo.src = "https://x5xyx35pwx90vl1i.public.blob.vercel-storage.com/Next%20video%201060x1920-xfdzSpjJsSPGyT2jZpP26cxhGkBgjz.mp4";
+            }
+        }
+
         if (userData) {
             greetingText.textContent = `${getGreeting()}, ${userData.name}!`;
             greetingText.style.display = 'block';
@@ -205,6 +214,7 @@
                 };
                 localStorage.setItem('userData', JSON.stringify(userData));
                 
+                setVideoSource(); // Set the video source based on orientation
                 introVideo.style.display = 'block';
                 introVideo.play();
 
@@ -220,6 +230,9 @@
                 alert('Please enter both your name and grade.');
             }
         });
+
+        // Update video source on orientation change
+        window.addEventListener('resize', setVideoSource);
     });
 
     function handleSubjectClick(subject) {
