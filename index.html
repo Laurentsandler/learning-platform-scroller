@@ -119,11 +119,31 @@
         .question {
             margin-bottom: 20px;
         }
+
+        #introVideo {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+            display: none;
+            background-color: black;
+        }
     </style>
 </head>
 <body>
 
-<div class="container" id="homeScreenContainer">
+<video id="introVideo" playsinline></video>
+
+<div class="container" id="welcomeContainer">
+    <input type="text" id="name" placeholder="Enter your name" required>
+    <input type="number" id="grade" placeholder="Enter your current grade" required>
+    <button id="startButton">Get Started</button>
+</div>
+
+<div class="container" id="homeScreenContainer" style="display: none;">
     <button class="subject-button" onclick="handleSubjectClick('Math')">Math</button>
     <button class="subject-button" onclick="handleSubjectClick('Science')">Science</button>
     <button class="subject-button" onclick="handleSubjectClick('History')">History</button>
@@ -177,6 +197,64 @@
         document.getElementById("questionContainer").style.display = 'block';
         document.getElementById("output").textContent = text;
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const userData = JSON.parse(localStorage.getItem('userData'));
+        const introVideo = document.getElementById('introVideo');
+        const body = document.body;
+        const welcomeContainer = document.getElementById('welcomeContainer');
+        const homeScreenContainer = document.getElementById('homeScreenContainer');
+
+        function setVideoSource() {
+            const isLandscape = window.innerWidth > window.innerHeight;
+            if (isLandscape) {
+                introVideo.src = "https://x5xyx35pwx90vl1i.public.blob.vercel-storage.com/Next%20Video%201060x1920%20(1)-yztE6k7edMgHAYoAJR6Ti4o799X1DF.mp4";
+            } else {
+                introVideo.src = "https://x5xyx35pwx90vl1i.public.blob.vercel-storage.com/Next%20video%201060x1920-xfdzSpjJsSPGyT2jZpP26cxhGkBgjz.mp4";
+            }
+        }
+
+        if (userData) {
+            // If user data exists, skip the welcome screen and go to home screen
+            welcomeContainer.style.display = 'none';
+            homeScreenContainer.style.display = 'block';
+            body.style.animation = "backgroundShift 15s infinite linear";
+        } else {
+            // Show welcome screen initially
+            welcomeContainer.style.display = 'block';
+            homeScreenContainer.style.display = 'none';
+        }
+
+        // When the "Get Started" button is clicked
+        document.getElementById('startButton').addEventListener('click', function () {
+            const name = document.getElementById('name').value.trim();
+            const grade = parseInt(document.getElementById('grade').value.trim());
+
+            if (name && grade) {
+                const userData = {
+                    name: name,
+                    grade: grade,
+                    lastUpdated: new Date().getFullYear()
+                };
+                localStorage.setItem('userData', JSON.stringify(userData));
+                
+                setVideoSource(); // Set the video source based on orientation
+                introVideo.style.display = 'block';
+                introVideo.play();
+
+                introVideo.onended = function () {
+                    introVideo.style.display = 'none';
+                    welcomeContainer.style.display = 'none';
+                    homeScreenContainer.style.display = 'block';
+                    body.style.animation = "backgroundShift 15s infinite linear";
+                };
+            } else {
+                alert("Please fill in your name and grade.");
+            }
+        });
+
+        window.addEventListener('resize', setVideoSource); // Change video source on orientation change
+    });
 
     function handleSubjectClick(subject) {
         document.getElementById('homeScreenContainer').style.display = 'none';
