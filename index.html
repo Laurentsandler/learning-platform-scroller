@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Learning Platform</title>
     <style>
-         body, html {
+          body, html {
             margin: 0;
             padding: 0;
             width: 100%;
@@ -208,7 +208,7 @@
         document.getElementById("output").textContent = text;
     }
 
-    function handleSubjectClick(subject) {
+    window.handleSubjectClick = function(subject) {
         document.getElementById('homeScreenContainer').style.display = 'none';
         document.getElementById('noteContainer').style.display = 'block';
     }
@@ -230,17 +230,14 @@
         }
 
         if (userData) {
-            // If user data exists, skip the welcome screen and go to home screen
             welcomeContainer.style.display = 'none';
             homeScreenContainer.style.display = 'block';
             body.style.animation = "backgroundShift 15s infinite linear";
         } else {
-            // Show welcome screen initially
             welcomeContainer.style.display = 'block';
             homeScreenContainer.style.display = 'none';
         }
 
-        // When the "Get Started" button is clicked
         document.getElementById('startButton').addEventListener('click', function () {
             const name = document.getElementById('name').value.trim();
             const grade = parseInt(document.getElementById('grade').value.trim());
@@ -253,7 +250,7 @@
                 };
                 localStorage.setItem('userData', JSON.stringify(userData));
                 
-                setVideoSource(); // Set the video source based on orientation
+                setVideoSource();
                 introVideo.style.display = 'block';
                 introVideo.play();
 
@@ -268,9 +265,8 @@
             }
         });
 
-        window.addEventListener('resize', setVideoSource); // Change video source on orientation change
+        window.addEventListener('resize', setVideoSource);
     });
-
 </script>
 
 </body>
