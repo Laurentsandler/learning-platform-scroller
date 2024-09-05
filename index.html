@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Learning Platform</title>
     <style>
-          body, html {
+         body, html {
             margin: 0;
             padding: 0;
             width: 100%;
@@ -165,7 +165,7 @@
     <button id="createQuestionsButton" onclick="createQuestions()">Create Questions</button>
 </div>
 
-<div class="container question-container" id="questionContainer">
+<div class="container question-container" id="questionContainer" style="display: none;">
     <div id="output"></div>
 </div>
 
@@ -184,7 +184,8 @@
     const genAI = new GoogleGenerativeAI(API_KEY);
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-    async function createQuestions() {
+    // Attach createQuestions function to window
+    window.createQuestions = async function() {
         const notes = document.getElementById("notes").value.trim();
         if (!notes) {
             alert("Please paste your notes.");
@@ -206,7 +207,7 @@
 
         document.getElementById("questionContainer").style.display = 'block';
         document.getElementById("output").textContent = text;
-    }
+    };
 
     window.handleSubjectClick = function(subject) {
         document.getElementById('homeScreenContainer').style.display = 'none';
