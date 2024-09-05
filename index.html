@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Learning Platform</title>
     <style>
-         body, html {
+          body, html {
             margin: 0;
             padding: 0;
             width: 100%;
@@ -165,8 +165,16 @@
     <button id="createQuestionsButton" onclick="createQuestions()">Create Questions</button>
 </div>
 
-<div class="container question-container" id="questionContainer" style="display: none;">
-    <div id="output"></div>
+<div class="container" id="quizContainer" style="display: none;">
+    <div id="questionDisplay"></div>
+    <button id="answerA" onclick="submitAnswer('a')"></button>
+    <button id="answerB" onclick="submitAnswer('b')"></button>
+    <button id="answerC" onclick="submitAnswer('c')"></button>
+</div>
+
+<div class="container" id="feedbackContainer" style="display: none;">
+    <div id="feedback"></div>
+    <button onclick="nextQuestion()">Next Question</button>
 </div>
 
 <script type="importmap">
@@ -184,7 +192,9 @@
     const genAI = new GoogleGenerativeAI(API_KEY);
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-    // Attach createQuestions function to window
+    let questions = [];
+    let currentQuestionIndex = 0;
+
     window.createQuestions = async function() {
         const notes = document.getElementById("notes").value.trim();
         if (!notes) {
@@ -205,8 +215,63 @@
         const response = await result.response;
         const text = response.text().replace(/\*/g, ''); // Remove \* characters
 
-        document.getElementById("questionContainer").style.display = 'block';
-        document.getElementById("output").textContent = text;
+        // Parse questions into array
+        questions = parseQuestions(text);
+        if (questions.length > 0) {
+            document.getElementById("noteContainer").style.display = 'none';
+            document.getElementById("quizContainer").style.display = 'block';
+            showQuestion();
+        }
+    };
+
+    function parseQuestions(text) {
+        // Split by question number to get each question
+        const rawQuestions = text.split(/\d+\./).filter(q => q.trim() !== "");
+        const formattedQuestions = rawQuestions.map(q => {
+            const [question, answerA, answerB, answerC, correct] = q.split('\n').map(str => str.trim());
+            return {
+                question: question,
+                answers: {
+                    a: answerA.split(") ")[1],
+                    b: answerB.split(") ")[1],
+                    c: answerC.split(") ")[1]
+                },
+                correctAnswer: correct.split(": ")[1]
+            };
+        });
+        return formattedQuestions;
+    }
+
+    function showQuestion() {
+        const question = questions[currentQuestionIndex];
+        document.getElementById('questionDisplay').textContent = question.question;
+        document.getElementById('answerA').textContent = question.answers.a;
+        document.getElementById('answerB').textContent = question.answers.b;
+        document.getElementById('answerC').textContent = question.answers.c;
+    }
+
+    window.submitAnswer = function(selectedAnswer) {
+        const question = questions[currentQuestionIndex];
+        const isCorrect = (selectedAnswer === question.correctAnswer);
+
+        document.getElementById("quizContainer").style.display = 'none';
+        document.getElementById("feedbackContainer").style.display = 'block';
+        document.getElementById("feedback").textContent = isCorrect ? "Correct!" : `Incorrect! The correct answer was ${question.correctAnswer}`;
+    };
+
+    window.nextQuestion = function() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < questions.length) {
+            document.getElementById("feedbackContainer").style.display = 'none';
+            document.getElementById("quizContainer").style.display = 'block';
+            showQuestion();
+        } else {
+            alert("Quiz completed!");
+            // Reset quiz
+            currentQuestionIndex = 0;
+            document.getElementById("feedbackContainer").style.display = 'none';
+            document.getElementById("homeScreenContainer").style.display = 'block';
+        }
     };
 
     window.handleSubjectClick = function(subject) {
