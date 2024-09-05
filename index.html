@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Learning Platform</title>
     <style>
-        body, html {
+         body, html {
             margin: 0;
             padding: 0;
             width: 100%;
@@ -42,6 +42,14 @@
             text-align: center;
         }
 
+        .greeting {
+            font-size: 28px;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: none;
+        }
+
         button {
             width: 100%;
             padding: 12px;
@@ -52,7 +60,7 @@
             cursor: pointer;
         }
 
-        input, textarea {
+        input {
             width: 90%;
             padding: 12px;
             margin: 10px 0;
@@ -62,9 +70,6 @@
             cursor: pointer;
         }
 
-        .note-area {
-            height: 150px;
-        }
 
         button {
             background-color: #6c63ff;
@@ -80,12 +85,12 @@
             background-color: #4e4ac9;
         }
 
-        input, textarea {
+        input {
             background-color: #6C63FE;
             color: #333;
         }
 
-        input:focus, textarea:focus {
+        input:focus {
             outline: none;
             box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
         }
@@ -111,13 +116,17 @@
             transform: scale(1);
         }
 
-        .question-container {
-            display: none;
-            margin-top: 20px;
+        @keyframes bounce {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
         }
 
-        .question {
-            margin-bottom: 20px;
+        .subject-button.clicked {
+            animation: bounce 0.5s ease-in-out;
         }
 
         #introVideo {
@@ -131,6 +140,7 @@
             display: none;
             background-color: black;
         }
+
     </style>
 </head>
 <body>
@@ -198,6 +208,11 @@
         document.getElementById("output").textContent = text;
     }
 
+    function handleSubjectClick(subject) {
+        document.getElementById('homeScreenContainer').style.display = 'none';
+        document.getElementById('noteContainer').style.display = 'block';
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         const userData = JSON.parse(localStorage.getItem('userData'));
         const introVideo = document.getElementById('introVideo');
@@ -256,10 +271,6 @@
         window.addEventListener('resize', setVideoSource); // Change video source on orientation change
     });
 
-    function handleSubjectClick(subject) {
-        document.getElementById('homeScreenContainer').style.display = 'none';
-        document.getElementById('noteContainer').style.display = 'block';
-    }
 </script>
 
 </body>
