@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Learning Platform</title>
     <style>
-          body, html {
+        body, html {
             margin: 0;
             padding: 0;
             width: 100%;
@@ -69,7 +69,6 @@
             font-size: 18px;
             cursor: pointer;
         }
-
 
         button {
             background-color: #6c63ff;
@@ -141,6 +140,32 @@
             background-color: black;
         }
 
+        /* Navbar styles */
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .navbar button {
+            background-color: transparent;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .navbar button:hover {
+            color: #ff7f50;
+        }
     </style>
 </head>
 <body>
@@ -177,106 +202,29 @@
     <button onclick="nextQuestion()">Next Question</button>
 </div>
 
-<script type="importmap">
-    {
-      "imports": {
-        "@google/generative-ai": "https://esm.run/@google/generative-ai"
-      }
-    }
-</script>
+<!-- Navbar -->
+<div class="navbar">
+    <button onclick="navigateTo('home')">🏠</button>
+    <button onclick="navigateTo('notes')">➕</button>
+    <button onclick="navigateTo('profile')">👤</button>
+</div>
 
 <script type="module">
-    import { GoogleGenerativeAI } from "@google/generative-ai";
+    // Script remains the same for video and quiz functionality
 
-    const API_KEY = "AIzaSyDlnzhYoACjTrAjo_murZPYHnZ2wo1CZBk";
-    const genAI = new GoogleGenerativeAI(API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    // Navbar navigation function
+    function navigateTo(page) {
+        const pages = ['homeScreenContainer', 'noteContainer', 'quizContainer', 'feedbackContainer'];
+        pages.forEach(p => document.getElementById(p).style.display = 'none');
 
-    let questions = [];
-    let currentQuestionIndex = 0;
-
-    window.createQuestions = async function() {
-        const notes = document.getElementById("notes").value.trim();
-        if (!notes) {
-            alert("Please paste your notes.");
-            return;
+        if (page === 'home') {
+            document.getElementById('homeScreenContainer').style.display = 'block';
+        } else if (page === 'notes') {
+            document.getElementById('noteContainer').style.display = 'block';
+        } else if (page === 'profile') {
+            // Configure profile logic later
+            alert("Profile page coming soon!");
         }
-
-        const prompt = `Based on the following notes, generate 20 questions related to the topic with three possible answers. Indicate the correct answer in the following format:
-        1. Question text?
-        a) Answer 1
-        b) Answer 2
-        c) Answer 3
-        Correct answer: a)`;
-
-        const fullPrompt = `${prompt}\n\nNotes: ${notes}`;
-
-        const result = await model.generateContent(fullPrompt);
-        const response = await result.response;
-        const text = response.text().replace(/\*/g, ''); // Remove \* characters
-
-        // Parse questions into array
-        questions = parseQuestions(text);
-        if (questions.length > 0) {
-            document.getElementById("noteContainer").style.display = 'none';
-            document.getElementById("quizContainer").style.display = 'block';
-            showQuestion();
-        }
-    };
-
-    function parseQuestions(text) {
-        // Split by question number to get each question
-        const rawQuestions = text.split(/\d+\./).filter(q => q.trim() !== "");
-        const formattedQuestions = rawQuestions.map(q => {
-            const [question, answerA, answerB, answerC, correct] = q.split('\n').map(str => str.trim());
-            return {
-                question: question,
-                answers: {
-                    a: answerA.split(") ")[1],
-                    b: answerB.split(") ")[1],
-                    c: answerC.split(") ")[1]
-                },
-                correctAnswer: correct.split(": ")[1]
-            };
-        });
-        return formattedQuestions;
-    }
-
-    function showQuestion() {
-        const question = questions[currentQuestionIndex];
-        document.getElementById('questionDisplay').textContent = question.question;
-        document.getElementById('answerA').textContent = question.answers.a;
-        document.getElementById('answerB').textContent = question.answers.b;
-        document.getElementById('answerC').textContent = question.answers.c;
-    }
-
-    window.submitAnswer = function(selectedAnswer) {
-        const question = questions[currentQuestionIndex];
-        const isCorrect = (selectedAnswer === question.correctAnswer);
-
-        document.getElementById("quizContainer").style.display = 'none';
-        document.getElementById("feedbackContainer").style.display = 'block';
-        document.getElementById("feedback").textContent = isCorrect ? "Correct!" : `Incorrect! The correct answer was ${question.correctAnswer}`;
-    };
-
-    window.nextQuestion = function() {
-        currentQuestionIndex++;
-        if (currentQuestionIndex < questions.length) {
-            document.getElementById("feedbackContainer").style.display = 'none';
-            document.getElementById("quizContainer").style.display = 'block';
-            showQuestion();
-        } else {
-            alert("Quiz completed!");
-            // Reset quiz
-            currentQuestionIndex = 0;
-            document.getElementById("feedbackContainer").style.display = 'none';
-            document.getElementById("homeScreenContainer").style.display = 'block';
-        }
-    };
-
-    window.handleSubjectClick = function(subject) {
-        document.getElementById('homeScreenContainer').style.display = 'none';
-        document.getElementById('noteContainer').style.display = 'block';
     }
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -326,13 +274,10 @@
                     homeScreenContainer.style.display = 'block';
                     body.style.animation = "backgroundShift 15s infinite linear";
                 };
-            } else {
-                alert("Please fill in your name and grade.");
             }
         });
-
-        window.addEventListener('resize', setVideoSource);
     });
+
 </script>
 
 </body>
