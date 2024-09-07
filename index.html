@@ -225,22 +225,33 @@
     };
 
     function parseQuestions(text) {
-        // Split by question number to get each question
-        const rawQuestions = text.split(/\d+\./).filter(q => q.trim() !== "");
-        const formattedQuestions = rawQuestions.map(q => {
-            const [question, answerA, answerB, answerC, correct] = q.split('\n').map(str => str.trim());
-            return {
-                question: question,
-                answers: {
-                    a: answerA.split(") ")[1],
-                    b: answerB.split(") ")[1],
-                    c: answerC.split(") ")[1]
-                },
-                correctAnswer: correct.split(": ")[1]
-            };
-        });
-        return formattedQuestions;
-    }
+    // Split by question number to get each question
+    const rawQuestions = text.split(/\d+\./).filter(q => q.trim() !== "");
+    const formattedQuestions = rawQuestions.map(q => {
+        const lines = q.split('\n').map(str => str.trim());
+        const question = lines[0];
+        const answerA = lines[1].split(") ")[1];
+        const answerB = lines[2].split(") ")[1];
+        const answerC = lines[3].split(") ")[1];
+
+        // Extract the correct answer (ensure correct answer format consistency)
+        let correctAnswer = lines[4].split(": ")[1].trim().toLowerCase(); 
+        if (correctAnswer === 'a') correctAnswer = answerA;
+        if (correctAnswer === 'b') correctAnswer = answerB;
+        if (correctAnswer === 'c') correctAnswer = answerC;
+
+        return {
+            question,
+            answers: {
+                a: answerA,
+                b: answerB,
+                c: answerC
+            },
+            correctAnswer
+        };
+    });
+    return formattedQuestions;
+}
 
     function showQuestion() {
         const question = questions[currentQuestionIndex];
@@ -250,14 +261,16 @@
         document.getElementById('answerC').textContent = question.answers.c;
     }
 
-    window.submitAnswer = function(selectedAnswer) {
-        const question = questions[currentQuestionIndex];
-        const isCorrect = (selectedAnswer === question.correctAnswer);
+   window.submitAnswer = function(selectedAnswer) {
+    const question = questions[currentQuestionIndex];
+    const selectedText = question.answers[selectedAnswer];
+    const isCorrect = (selectedText === question.correctAnswer);
 
-        document.getElementById("quizContainer").style.display = 'none';
-        document.getElementById("feedbackContainer").style.display = 'block';
-        document.getElementById("feedback").textContent = isCorrect ? "Correct!" : `Incorrect! The correct answer was ${question.correctAnswer}`;
-    };
+    document.getElementById("quizContainer").style.display = 'none';
+    document.getElementById("feedbackContainer").style.display = 'block';
+    document.getElementById("feedback").textContent = isCorrect ? "Correct!" : `Incorrect! The correct answer was ${question.correctAnswer}`;
+};
+
 
     window.nextQuestion = function() {
         currentQuestionIndex++;
