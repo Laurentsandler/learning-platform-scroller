@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Learning Platform</title>
     <style>
-        body, html {
+          body, html {
             margin: 0;
             padding: 0;
             width: 100%;
@@ -13,15 +13,26 @@
             overflow: hidden;
             font-family: 'Roboto', sans-serif;
             color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             background: radial-gradient(circle at 25% 25%, #ff7f50, transparent, transparent),
                         radial-gradient(circle at 75% 25%, #6495ed, transparent, transparent),
                         radial-gradient(circle at 25% 75%, #ff69b4, transparent, transparent),
                         radial-gradient(circle at 75% 75%, #ba55d3, transparent, transparent);
             background-size: 200% 200%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            animation: backgroundShift 15s infinite linear;
+        }
+
+        @keyframes backgroundShift {
+            0% {
+                background-position: 0% 0%;
+            }
+            50% {
+                background-position: 100% 100%;
+            }
+            100% {
+                background-position: 0% 0%;
+            }
         }
 
         .container {
@@ -29,10 +40,6 @@
             max-width: 400px;
             padding: 20px;
             text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
         }
 
         .greeting {
@@ -43,7 +50,7 @@
             display: none;
         }
 
-        button, input, textarea {
+        button {
             width: 100%;
             padding: 12px;
             margin: 10px 0;
@@ -53,26 +60,37 @@
             cursor: pointer;
         }
 
+        input {
+            width: 90%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+
         button {
-            background-color: transparent; /* Remove the blue background */
+            background-color: #6c63ff;
             color: #fff;
             transition: background-color 0.3s ease;
         }
 
         button:hover {
-            background-color: rgba(255, 255, 255, 0.2); /* Light hover effect */
+            background-color: #5a54e7;
         }
 
         button:active {
-            background-color: rgba(255, 255, 255, 0.4); /* Active click effect */
+            background-color: #4e4ac9;
         }
 
-        input, textarea {
+        input {
             background-color: #6C63FE;
             color: #333;
         }
 
-        input:focus, textarea:focus {
+        input:focus {
             outline: none;
             box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
         }
@@ -81,7 +99,7 @@
             padding: 12px;
             margin: 10px 0;
             border-radius: 8px;
-            background-color: transparent; /* Remove blue background */
+            background-color: #6c63ff;
             color: #fff;
             font-size: 18px;
             cursor: pointer;
@@ -89,32 +107,26 @@
         }
 
         .subject-button:hover {
-            background-color: rgba(255, 255, 255, 0.2); /* Light hover effect */
+            background-color: #5a54e7;
             transform: scale(1.05);
         }
 
         .subject-button:active {
-            background-color: rgba(255, 255, 255, 0.4); /* Active click effect */
+            background-color: #4e4ac9;
             transform: scale(1);
         }
 
-        .navbar {
-            width: 100%;
-            height: 60px;
-            background-color: #6c63ff;
-            position: absolute;
-            bottom: 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2);
+        @keyframes bounce {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
         }
 
-        .navbar button {
-            width: auto;
-            padding: 10px;
-            border-radius: 50%;
+        .subject-button.clicked {
+            animation: bounce 0.5s ease-in-out;
         }
 
         #introVideo {
@@ -129,11 +141,6 @@
             background-color: black;
         }
 
-        @keyframes backgroundShift {
-            0% { background-position: 0% 0%; }
-            50% { background-position: 100% 100%; }
-            100% { background-position: 0% 0%; }
-        }
     </style>
 </head>
 <body>
@@ -170,170 +177,162 @@
     <button onclick="nextQuestion()">Next Question</button>
 </div>
 
-<div class="navbar">
-    <button onclick="navigateToHome()">🏠</button>
-    <button onclick="navigateToNotes()">➕</button>
-    <button onclick="navigateToProfile()">👤</button>
-</div>
-
-<script>
-let questions = [];
-let currentQuestionIndex = 0;
-
-window.createQuestions = async function() {
-    const notes = document.getElementById("notes").value.trim();
-    if (!notes) {
-        alert("Please paste your notes.");
-        return;
+<script type="importmap">
+    {
+      "imports": {
+        "@google/generative-ai": "https://esm.run/@google/generative-ai"
+      }
     }
+</script>
 
-    const prompt = `Based on the following notes, generate 20 questions related to the topic with three possible answers. Indicate the correct answer in the following format:
-    1. Question text?
-    a) Answer 1
-    b) Answer 2
-    c) Answer 3
-    Correct answer: a)`;
+<script type="module">
+    import { GoogleGenerativeAI } from "@google/generative-ai";
 
-    const fullPrompt = `${prompt}\n\nNotes: ${notes}`;
+    const API_KEY = "AIzaSyDlnzhYoACjTrAjo_murZPYHnZ2wo1CZBk";
+    const genAI = new GoogleGenerativeAI(API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-    const result = await model.generateContent(fullPrompt);
-    const response = await result.response;
-    const text = response.text().replace(/\*/g, ''); // Remove unwanted characters
+    let questions = [];
+    let currentQuestionIndex = 0;
 
-    // Parse questions into an array
-    questions = parseQuestions(text);
-    if (questions.length > 0) {
-        document.getElementById("noteContainer").style.display = 'none';
-        document.getElementById("quizContainer").style.display = 'block';
-        showQuestion();
-    }
-};
-
-function parseQuestions(text) {
-    // Split by question number to extract each question
-    const rawQuestions = text.split(/\d+\./).filter(q => q.trim() !== "");
-    const formattedQuestions = rawQuestions.map(q => {
-        const [question, answerA, answerB, answerC, correct] = q.split('\n').map(str => str.trim());
-        return {
-            question: question,
-            answers: {
-                a: answerA.split(") ")[1],
-                b: answerB.split(") ")[1],
-                c: answerC.split(") ")[1]
-            },
-            correctAnswer: correct.split(": ")[1]
-        };
-    });
-    return formattedQuestions;
-}
-
-function showQuestion() {
-    const question = questions[currentQuestionIndex];
-    document.getElementById('questionDisplay').textContent = question.question;
-    document.getElementById('answerA').textContent = question.answers.a;
-    document.getElementById('answerB').textContent = question.answers.b;
-    document.getElementById('answerC').textContent = question.answers.c;
-}
-
-window.submitAnswer = function(selectedAnswer) {
-    const question = questions[currentQuestionIndex];
-    const isCorrect = (selectedAnswer === question.correctAnswer);
-
-    document.getElementById("quizContainer").style.display = 'none';
-    document.getElementById("feedbackContainer").style.display = 'block';
-    document.getElementById("feedback").textContent = isCorrect ? "Correct!" : `Incorrect! The correct answer was ${question.correctAnswer}`;
-};
-
-window.nextQuestion = function() {
-    currentQuestionIndex++;
-    if (currentQuestionIndex < questions.length) {
-        document.getElementById("feedbackContainer").style.display = 'none';
-        document.getElementById("quizContainer").style.display = 'block';
-        showQuestion();
-    } else {
-        alert("Quiz completed!");
-        currentQuestionIndex = 0; // Reset quiz
-        document.getElementById("feedbackContainer").style.display = 'none';
-        document.getElementById("homeScreenContainer").style.display = 'block';
-    }
-};
-
-window.handleSubjectClick = function(subject) {
-    document.getElementById('homeScreenContainer').style.display = 'none';
-    document.getElementById('noteContainer').style.display = 'block';
-};
-
-document.addEventListener('DOMContentLoaded', function () {
-    const userData = JSON.parse(localStorage.getItem('userData'));
-    const introVideo = document.getElementById('introVideo');
-    const body = document.body;
-    const welcomeContainer = document.getElementById('welcomeContainer');
-    const homeScreenContainer = document.getElementById('homeScreenContainer');
-
-    function setVideoSource() {
-        const isLandscape = window.innerWidth > window.innerHeight;
-        if (isLandscape) {
-            introVideo.src = "https://x5xyx35pwx90vl1i.public.blob.vercel-storage.com/Next%20Video%201060x1920%20(1)-yztE6k7edMgHAYoAJR6Ti4o799X1DF.mp4";
-        } else {
-            introVideo.src = "https://x5xyx35pwx90vl1i.public.blob.vercel-storage.com/Next%20video%201060x1920-xfdzSpjJsSPGyT2jZpP26cxhGkBgjz.mp4";
+    window.createQuestions = async function() {
+        const notes = document.getElementById("notes").value.trim();
+        if (!notes) {
+            alert("Please paste your notes.");
+            return;
         }
-    }
 
-    if (userData) {
-        welcomeContainer.style.display = 'none';
-        homeScreenContainer.style.display = 'block';
-        body.style.animation = "backgroundShift 15s infinite linear";
-    } else {
-        welcomeContainer.style.display = 'block';
-        homeScreenContainer.style.display = 'none';
-    }
+        const prompt = `Based on the following notes, generate 20 questions related to the topic with three possible answers. Indicate the correct answer in the following format:
+        1. Question text?
+        a) Answer 1
+        b) Answer 2
+        c) Answer 3
+        Correct answer: a)`;
 
-    document.getElementById('startButton').addEventListener('click', function () {
-        const name = document.getElementById('name').value.trim();
-        const grade = parseInt(document.getElementById('grade').value.trim());
+        const fullPrompt = `${prompt}\n\nNotes: ${notes}`;
 
-        if (name && grade) {
-            const userData = {
-                name: name,
-                grade: grade,
-                lastUpdated: new Date().getFullYear()
-            };
-            localStorage.setItem('userData', JSON.stringify(userData));
-            
-            setVideoSource();
-            introVideo.style.display = 'block';
-            introVideo.play();
+        const result = await model.generateContent(fullPrompt);
+        const response = await result.response;
+        const text = response.text().replace(/\*/g, ''); // Remove \* characters
 
-            introVideo.onended = function () {
-                introVideo.style.display = 'none';
-                welcomeContainer.style.display = 'none';
-                homeScreenContainer.style.display = 'block';
-                body.style.animation = "backgroundShift 15s infinite linear";
-            };
-        } else {
-            alert("Please fill in your name and grade.");
+        // Parse questions into array
+        questions = parseQuestions(text);
+        if (questions.length > 0) {
+            document.getElementById("noteContainer").style.display = 'none';
+            document.getElementById("quizContainer").style.display = 'block';
+            showQuestion();
         }
+    };
+
+    function parseQuestions(text) {
+        // Split by question number to get each question
+        const rawQuestions = text.split(/\d+\./).filter(q => q.trim() !== "");
+        const formattedQuestions = rawQuestions.map(q => {
+            const [question, answerA, answerB, answerC, correct] = q.split('\n').map(str => str.trim());
+            return {
+                question: question,
+                answers: {
+                    a: answerA.split(") ")[1],
+                    b: answerB.split(") ")[1],
+                    c: answerC.split(") ")[1]
+                },
+                correctAnswer: correct.split(": ")[1]
+            };
+        });
+        return formattedQuestions;
+    }
+
+    function showQuestion() {
+        const question = questions[currentQuestionIndex];
+        document.getElementById('questionDisplay').textContent = question.question;
+        document.getElementById('answerA').textContent = question.answers.a;
+        document.getElementById('answerB').textContent = question.answers.b;
+        document.getElementById('answerC').textContent = question.answers.c;
+    }
+
+    window.submitAnswer = function(selectedAnswer) {
+        const question = questions[currentQuestionIndex];
+        const isCorrect = (selectedAnswer === question.correctAnswer);
+
+        document.getElementById("quizContainer").style.display = 'none';
+        document.getElementById("feedbackContainer").style.display = 'block';
+        document.getElementById("feedback").textContent = isCorrect ? "Correct!" : `Incorrect! The correct answer was ${question.correctAnswer}`;
+    };
+
+    window.nextQuestion = function() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < questions.length) {
+            document.getElementById("feedbackContainer").style.display = 'none';
+            document.getElementById("quizContainer").style.display = 'block';
+            showQuestion();
+        } else {
+            alert("Quiz completed!");
+            // Reset quiz
+            currentQuestionIndex = 0;
+            document.getElementById("feedbackContainer").style.display = 'none';
+            document.getElementById("homeScreenContainer").style.display = 'block';
+        }
+    };
+
+    window.handleSubjectClick = function(subject) {
+        document.getElementById('homeScreenContainer').style.display = 'none';
+        document.getElementById('noteContainer').style.display = 'block';
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const userData = JSON.parse(localStorage.getItem('userData'));
+        const introVideo = document.getElementById('introVideo');
+        const body = document.body;
+        const welcomeContainer = document.getElementById('welcomeContainer');
+        const homeScreenContainer = document.getElementById('homeScreenContainer');
+
+        function setVideoSource() {
+            const isLandscape = window.innerWidth > window.innerHeight;
+            if (isLandscape) {
+                introVideo.src = "https://x5xyx35pwx90vl1i.public.blob.vercel-storage.com/Next%20Video%201060x1920%20(1)-yztE6k7edMgHAYoAJR6Ti4o799X1DF.mp4";
+            } else {
+                introVideo.src = "https://x5xyx35pwx90vl1i.public.blob.vercel-storage.com/Next%20video%201060x1920-xfdzSpjJsSPGyT2jZpP26cxhGkBgjz.mp4";
+            }
+        }
+
+        if (userData) {
+            welcomeContainer.style.display = 'none';
+            homeScreenContainer.style.display = 'block';
+            body.style.animation = "backgroundShift 15s infinite linear";
+        } else {
+            welcomeContainer.style.display = 'block';
+            homeScreenContainer.style.display = 'none';
+        }
+
+        document.getElementById('startButton').addEventListener('click', function () {
+            const name = document.getElementById('name').value.trim();
+            const grade = parseInt(document.getElementById('grade').value.trim());
+
+            if (name && grade) {
+                const userData = {
+                    name: name,
+                    grade: grade,
+                    lastUpdated: new Date().getFullYear()
+                };
+                localStorage.setItem('userData', JSON.stringify(userData));
+                
+                setVideoSource();
+                introVideo.style.display = 'block';
+                introVideo.play();
+
+                introVideo.onended = function () {
+                    introVideo.style.display = 'none';
+                    welcomeContainer.style.display = 'none';
+                    homeScreenContainer.style.display = 'block';
+                    body.style.animation = "backgroundShift 15s infinite linear";
+                };
+            } else {
+                alert("Please fill in your name and grade.");
+            }
+        });
+
+        window.addEventListener('resize', setVideoSource);
     });
-
-    window.addEventListener('resize', setVideoSource);
-});
-
-
-// Example functions for navigation buttons
-function navigateToHome() {
-    document.getElementById('homeScreenContainer').style.display = 'block';
-    document.getElementById('noteContainer').style.display = 'none';
-    document.getElementById('quizContainer').style.display = 'none';
-}
-
-function navigateToNotes() {
-    document.getElementById('homeScreenContainer').style.display = 'none';
-    document.getElementById('noteContainer').style.display = 'block';
-}
-
-function navigateToProfile() {
-    // Handle navigation to profile (to be implemented later)
-}
 </script>
 
 </body>
