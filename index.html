@@ -194,7 +194,7 @@
 
     let questions = [];
     let currentQuestionIndex = 0;
-    let firstSetComplete = false;
+    let answeredQuestions = 0;  // Track how many questions have been answered
 
     window.createQuestions = async function() {
         const notes = document.getElementById("notes").value.trim();
@@ -217,7 +217,8 @@
         const text = response.text().replace(/\*/g, ''); // Remove \* characters
 
         // Parse questions into array
-        questions = parseQuestions(text);
+        const newQuestions = parseQuestions(text);
+        questions = [...questions, ...newQuestions];  // Append new questions
         if (questions.length > 0) {
             document.getElementById("noteContainer").style.display = 'none';
             document.getElementById("quizContainer").style.display = 'block';
@@ -271,26 +272,23 @@
         document.getElementById("quizContainer").style.display = 'none';
         document.getElementById("feedbackContainer").style.display = 'block';
         document.getElementById("feedback").textContent = isCorrect ? "Correct!" : `Incorrect! The correct answer was ${question.correctAnswer.toUpperCase()}`;
+
+        answeredQuestions++;  // Increment the count of answered questions
     };
 
-    window.nextQuestion = async function() {
+    window.nextQuestion = function() {
         currentQuestionIndex++;
-
         if (currentQuestionIndex < questions.length) {
             document.getElementById("feedbackContainer").style.display = 'none';
             document.getElementById("quizContainer").style.display = 'block';
             showQuestion();
-        } else if (!firstSetComplete) {
-            // If first set is complete, generate new questions
-            firstSetComplete = true;
-            alert("First set of 20 questions completed! Generating new questions...");
-
-            // Generate a new set of 20 questions
-            await createQuestions();
-            currentQuestionIndex = 0;
+        } else if (answeredQuestions % 5 === 0) {
+            // Generate new questions after every 5 answered questions
+            alert("Generating new questions...");
+            createQuestions();  // Generate new questions
         } else {
-            alert("All questions completed!");
-            // Reset quiz or navigate to another page
+            alert("Quiz completed!");
+            // Reset quiz
             currentQuestionIndex = 0;
             document.getElementById("feedbackContainer").style.display = 'none';
             document.getElementById("homeScreenContainer").style.display = 'block';
@@ -338,7 +336,7 @@
                     lastUpdated: new Date().getFullYear()
                 };
                 localStorage.setItem('userData', JSON.stringify(userData));
-
+                
                 setVideoSource();
                 introVideo.style.display = 'block';
                 introVideo.play();
