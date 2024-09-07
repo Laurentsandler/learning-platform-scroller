@@ -51,21 +51,20 @@
             border: none;
             font-size: 18px;
             cursor: pointer;
-            box-shadow: none; /* Remove background */
         }
 
         button {
-            background-color: #6c63ff;
+            background-color: transparent; /* Remove the blue background */
             color: #fff;
             transition: background-color 0.3s ease;
         }
 
         button:hover {
-            background-color: #5a54e7;
+            background-color: rgba(255, 255, 255, 0.2); /* Light hover effect */
         }
 
         button:active {
-            background-color: #4e4ac9;
+            background-color: rgba(255, 255, 255, 0.4); /* Active click effect */
         }
 
         input, textarea {
@@ -82,7 +81,7 @@
             padding: 12px;
             margin: 10px 0;
             border-radius: 8px;
-            background-color: #6c63ff;
+            background-color: transparent; /* Remove blue background */
             color: #fff;
             font-size: 18px;
             cursor: pointer;
@@ -90,12 +89,12 @@
         }
 
         .subject-button:hover {
-            background-color: #5a54e7;
+            background-color: rgba(255, 255, 255, 0.2); /* Light hover effect */
             transform: scale(1.05);
         }
 
         .subject-button:active {
-            background-color: #4e4ac9;
+            background-color: rgba(255, 255, 255, 0.4); /* Active click effect */
             transform: scale(1);
         }
 
@@ -178,154 +177,146 @@
 </div>
 
 <script>
-<script type="module">
-    import { GoogleGenerativeAI } from "@google/generative-ai";
+let questions = [];
+let currentQuestionIndex = 0;
 
-    const API_KEY = "AIzaSyDlnzhYoACjTrAjo_murZPYHnZ2wo1CZBk";
-    const genAI = new GoogleGenerativeAI(API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-
-    let questions = [];
-    let currentQuestionIndex = 0;
-
-    window.createQuestions = async function() {
-        const notes = document.getElementById("notes").value.trim();
-        if (!notes) {
-            alert("Please paste your notes.");
-            return;
-        }
-
-        const prompt = `Based on the following notes, generate 20 questions related to the topic with three possible answers. Indicate the correct answer in the following format:
-        1. Question text?
-        a) Answer 1
-        b) Answer 2
-        c) Answer 3
-        Correct answer: a)`;
-
-        const fullPrompt = `${prompt}\n\nNotes: ${notes}`;
-
-        const result = await model.generateContent(fullPrompt);
-        const response = await result.response;
-        const text = response.text().replace(/\*/g, ''); // Remove \* characters
-
-        // Parse questions into array
-        questions = parseQuestions(text);
-        if (questions.length > 0) {
-            document.getElementById("noteContainer").style.display = 'none';
-            document.getElementById("quizContainer").style.display = 'block';
-            showQuestion();
-        }
-    };
-
-    function parseQuestions(text) {
-        // Split by question number to get each question
-        const rawQuestions = text.split(/\d+\./).filter(q => q.trim() !== "");
-        const formattedQuestions = rawQuestions.map(q => {
-            const [question, answerA, answerB, answerC, correct] = q.split('\n').map(str => str.trim());
-            return {
-                question: question,
-                answers: {
-                    a: answerA.split(") ")[1],
-                    b: answerB.split(") ")[1],
-                    c: answerC.split(") ")[1]
-                },
-                correctAnswer: correct.split(": ")[1]
-            };
-        });
-        return formattedQuestions;
+window.createQuestions = async function() {
+    const notes = document.getElementById("notes").value.trim();
+    if (!notes) {
+        alert("Please paste your notes.");
+        return;
     }
 
-    function showQuestion() {
-        const question = questions[currentQuestionIndex];
-        document.getElementById('questionDisplay').textContent = question.question;
-        document.getElementById('answerA').textContent = question.answers.a;
-        document.getElementById('answerB').textContent = question.answers.b;
-        document.getElementById('answerC').textContent = question.answers.c;
+    const prompt = `Based on the following notes, generate 20 questions related to the topic with three possible answers. Indicate the correct answer in the following format:
+    1. Question text?
+    a) Answer 1
+    b) Answer 2
+    c) Answer 3
+    Correct answer: a)`;
+
+    const fullPrompt = `${prompt}\n\nNotes: ${notes}`;
+
+    const result = await model.generateContent(fullPrompt);
+    const response = await result.response;
+    const text = response.text().replace(/\*/g, ''); // Remove unwanted characters
+
+    // Parse questions into an array
+    questions = parseQuestions(text);
+    if (questions.length > 0) {
+        document.getElementById("noteContainer").style.display = 'none';
+        document.getElementById("quizContainer").style.display = 'block';
+        showQuestion();
     }
+};
 
-    window.submitAnswer = function(selectedAnswer) {
-        const question = questions[currentQuestionIndex];
-        const isCorrect = (selectedAnswer === question.correctAnswer);
-
-        document.getElementById("quizContainer").style.display = 'none';
-        document.getElementById("feedbackContainer").style.display = 'block';
-        document.getElementById("feedback").textContent = isCorrect ? "Correct!" : `Incorrect! The correct answer was ${question.correctAnswer}`;
-    };
-
-    window.nextQuestion = function() {
-        currentQuestionIndex++;
-        if (currentQuestionIndex < questions.length) {
-            document.getElementById("feedbackContainer").style.display = 'none';
-            document.getElementById("quizContainer").style.display = 'block';
-            showQuestion();
-        } else {
-            alert("Quiz completed!");
-            // Reset quiz
-            currentQuestionIndex = 0;
-            document.getElementById("feedbackContainer").style.display = 'none';
-            document.getElementById("homeScreenContainer").style.display = 'block';
-        }
-    };
-
-    window.handleSubjectClick = function(subject) {
-        document.getElementById('homeScreenContainer').style.display = 'none';
-        document.getElementById('noteContainer').style.display = 'block';
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const userData = JSON.parse(localStorage.getItem('userData'));
-        const introVideo = document.getElementById('introVideo');
-        const body = document.body;
-        const welcomeContainer = document.getElementById('welcomeContainer');
-        const homeScreenContainer = document.getElementById('homeScreenContainer');
-
-        function setVideoSource() {
-            const isLandscape = window.innerWidth > window.innerHeight;
-            if (isLandscape) {
-                introVideo.src = "https://x5xyx35pwx90vl1i.public.blob.vercel-storage.com/Next%20Video%201060x1920%20(1)-yztE6k7edMgHAYoAJR6Ti4o799X1DF.mp4";
-            } else {
-                introVideo.src = "https://x5xyx35pwx90vl1i.public.blob.vercel-storage.com/Next%20video%201060x1920-xfdzSpjJsSPGyT2jZpP26cxhGkBgjz.mp4";
-            }
-        }
-
-        if (userData) {
-            welcomeContainer.style.display = 'none';
-            homeScreenContainer.style.display = 'block';
-            body.style.animation = "backgroundShift 15s infinite linear";
-        } else {
-            welcomeContainer.style.display = 'block';
-            homeScreenContainer.style.display = 'none';
-        }
-
-        document.getElementById('startButton').addEventListener('click', function () {
-            const name = document.getElementById('name').value.trim();
-            const grade = parseInt(document.getElementById('grade').value.trim());
-
-            if (name && grade) {
-                const userData = {
-                    name: name,
-                    grade: grade,
-                    lastUpdated: new Date().getFullYear()
-                };
-                localStorage.setItem('userData', JSON.stringify(userData));
-                
-                setVideoSource();
-                introVideo.style.display = 'block';
-                introVideo.play();
-
-                introVideo.onended = function () {
-                    introVideo.style.display = 'none';
-                    welcomeContainer.style.display = 'none';
-                    homeScreenContainer.style.display = 'block';
-                    body.style.animation = "backgroundShift 15s infinite linear";
-                };
-            } else {
-                alert("Please fill in your name and grade.");
-            }
-        });
-
-        window.addEventListener('resize', setVideoSource);
+function parseQuestions(text) {
+    // Split by question number to extract each question
+    const rawQuestions = text.split(/\d+\./).filter(q => q.trim() !== "");
+    const formattedQuestions = rawQuestions.map(q => {
+        const [question, answerA, answerB, answerC, correct] = q.split('\n').map(str => str.trim());
+        return {
+            question: question,
+            answers: {
+                a: answerA.split(") ")[1],
+                b: answerB.split(") ")[1],
+                c: answerC.split(") ")[1]
+            },
+            correctAnswer: correct.split(": ")[1]
+        };
     });
+    return formattedQuestions;
+}
+
+function showQuestion() {
+    const question = questions[currentQuestionIndex];
+    document.getElementById('questionDisplay').textContent = question.question;
+    document.getElementById('answerA').textContent = question.answers.a;
+    document.getElementById('answerB').textContent = question.answers.b;
+    document.getElementById('answerC').textContent = question.answers.c;
+}
+
+window.submitAnswer = function(selectedAnswer) {
+    const question = questions[currentQuestionIndex];
+    const isCorrect = (selectedAnswer === question.correctAnswer);
+
+    document.getElementById("quizContainer").style.display = 'none';
+    document.getElementById("feedbackContainer").style.display = 'block';
+    document.getElementById("feedback").textContent = isCorrect ? "Correct!" : `Incorrect! The correct answer was ${question.correctAnswer}`;
+};
+
+window.nextQuestion = function() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < questions.length) {
+        document.getElementById("feedbackContainer").style.display = 'none';
+        document.getElementById("quizContainer").style.display = 'block';
+        showQuestion();
+    } else {
+        alert("Quiz completed!");
+        currentQuestionIndex = 0; // Reset quiz
+        document.getElementById("feedbackContainer").style.display = 'none';
+        document.getElementById("homeScreenContainer").style.display = 'block';
+    }
+};
+
+window.handleSubjectClick = function(subject) {
+    document.getElementById('homeScreenContainer').style.display = 'none';
+    document.getElementById('noteContainer').style.display = 'block';
+};
+
+document.addEventListener('DOMContentLoaded', function () {
+    const userData = JSON.parse(localStorage.getItem('userData'));
+    const introVideo = document.getElementById('introVideo');
+    const body = document.body;
+    const welcomeContainer = document.getElementById('welcomeContainer');
+    const homeScreenContainer = document.getElementById('homeScreenContainer');
+
+    function setVideoSource() {
+        const isLandscape = window.innerWidth > window.innerHeight;
+        if (isLandscape) {
+            introVideo.src = "https://x5xyx35pwx90vl1i.public.blob.vercel-storage.com/Next%20Video%201060x1920%20(1)-yztE6k7edMgHAYoAJR6Ti4o799X1DF.mp4";
+        } else {
+            introVideo.src = "https://x5xyx35pwx90vl1i.public.blob.vercel-storage.com/Next%20video%201060x1920-xfdzSpjJsSPGyT2jZpP26cxhGkBgjz.mp4";
+        }
+    }
+
+    if (userData) {
+        welcomeContainer.style.display = 'none';
+        homeScreenContainer.style.display = 'block';
+        body.style.animation = "backgroundShift 15s infinite linear";
+    } else {
+        welcomeContainer.style.display = 'block';
+        homeScreenContainer.style.display = 'none';
+    }
+
+    document.getElementById('startButton').addEventListener('click', function () {
+        const name = document.getElementById('name').value.trim();
+        const grade = parseInt(document.getElementById('grade').value.trim());
+
+        if (name && grade) {
+            const userData = {
+                name: name,
+                grade: grade,
+                lastUpdated: new Date().getFullYear()
+            };
+            localStorage.setItem('userData', JSON.stringify(userData));
+            
+            setVideoSource();
+            introVideo.style.display = 'block';
+            introVideo.play();
+
+            introVideo.onended = function () {
+                introVideo.style.display = 'none';
+                welcomeContainer.style.display = 'none';
+                homeScreenContainer.style.display = 'block';
+                body.style.animation = "backgroundShift 15s infinite linear";
+            };
+        } else {
+            alert("Please fill in your name and grade.");
+        }
+    });
+
+    window.addEventListener('resize', setVideoSource);
+});
 
 
 // Example functions for navigation buttons
