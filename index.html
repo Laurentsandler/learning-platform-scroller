@@ -194,6 +194,7 @@
 
     let questions = [];
     let currentQuestionIndex = 0;
+    let firstSetComplete = false;
 
     window.createQuestions = async function() {
         const notes = document.getElementById("notes").value.trim();
@@ -225,32 +226,32 @@
     };
 
     function parseQuestions(text) {
-    const rawQuestions = text.split(/\d+\./).filter(q => q.trim() !== "");
+        const rawQuestions = text.split(/\d+\./).filter(q => q.trim() !== "");
 
-    return rawQuestions.map(q => {
-        const lines = q.split('\n').map(str => str.trim());
+        return rawQuestions.map(q => {
+            const lines = q.split('\n').map(str => str.trim());
 
-        // Extract the question and answers
-        const question = lines[0];
-        const answerA = lines[1].split(") ")[1];
-        const answerB = lines[2].split(") ")[1];
-        const answerC = lines[3].split(") ")[1];
+            // Extract the question and answers
+            const question = lines[0];
+            const answerA = lines[1].split(") ")[1];
+            const answerB = lines[2].split(") ")[1];
+            const answerC = lines[3].split(") ")[1];
 
-        // Extract the correct answer (handling different cases)
-        const correctLine = lines[4];
-        const correctAnswerLetter = correctLine.match(/Correct answer: ([a-c])/i)[1];
+            // Extract the correct answer (handling different cases)
+            const correctLine = lines[4];
+            const correctAnswerLetter = correctLine.match(/Correct answer: ([a-c])/i)[1];
 
-        return {
-            question,
-            answers: {
-                a: answerA,
-                b: answerB,
-                c: answerC
-            },
-            correctAnswer: correctAnswerLetter // Store 'a', 'b', or 'c'
-        };
-    });
-}
+            return {
+                question,
+                answers: {
+                    a: answerA,
+                    b: answerB,
+                    c: answerC
+                },
+                correctAnswer: correctAnswerLetter // Store 'a', 'b', or 'c'
+            };
+        });
+    }
 
     function showQuestion() {
         const question = questions[currentQuestionIndex];
@@ -260,28 +261,36 @@
         document.getElementById('answerC').textContent = question.answers.c;
     }
 
-   window.submitAnswer = function(selectedAnswer) {
-    const question = questions[currentQuestionIndex];
+    window.submitAnswer = function(selectedAnswer) {
+        const question = questions[currentQuestionIndex];
 
-    // Check if the selected answer matches the correct answer letter
-    const isCorrect = (selectedAnswer === question.correctAnswer);
+        // Check if the selected answer matches the correct answer letter
+        const isCorrect = (selectedAnswer === question.correctAnswer);
 
-    // Provide feedback based on whether the answer was correct
-    document.getElementById("quizContainer").style.display = 'none';
-    document.getElementById("feedbackContainer").style.display = 'block';
-    document.getElementById("feedback").textContent = isCorrect ? "Correct!" : `Incorrect! The correct answer was ${question.correctAnswer.toUpperCase()}`;
-};
+        // Provide feedback based on whether the answer was correct
+        document.getElementById("quizContainer").style.display = 'none';
+        document.getElementById("feedbackContainer").style.display = 'block';
+        document.getElementById("feedback").textContent = isCorrect ? "Correct!" : `Incorrect! The correct answer was ${question.correctAnswer.toUpperCase()}`;
+    };
 
-
-    window.nextQuestion = function() {
+    window.nextQuestion = async function() {
         currentQuestionIndex++;
+
         if (currentQuestionIndex < questions.length) {
             document.getElementById("feedbackContainer").style.display = 'none';
             document.getElementById("quizContainer").style.display = 'block';
             showQuestion();
+        } else if (!firstSetComplete) {
+            // If first set is complete, generate new questions
+            firstSetComplete = true;
+            alert("First set of 20 questions completed! Generating new questions...");
+
+            // Generate a new set of 20 questions
+            await createQuestions();
+            currentQuestionIndex = 0;
         } else {
-            alert("Quiz completed!");
-            // Reset quiz
+            alert("All questions completed!");
+            // Reset quiz or navigate to another page
             currentQuestionIndex = 0;
             document.getElementById("feedbackContainer").style.display = 'none';
             document.getElementById("homeScreenContainer").style.display = 'block';
@@ -291,7 +300,7 @@
     window.handleSubjectClick = function(subject) {
         document.getElementById('homeScreenContainer').style.display = 'none';
         document.getElementById('noteContainer').style.display = 'block';
-    }
+    };
 
     document.addEventListener('DOMContentLoaded', function () {
         const userData = JSON.parse(localStorage.getItem('userData'));
@@ -329,7 +338,7 @@
                     lastUpdated: new Date().getFullYear()
                 };
                 localStorage.setItem('userData', JSON.stringify(userData));
-                
+
                 setVideoSource();
                 introVideo.style.display = 'block';
                 introVideo.play();
@@ -348,6 +357,7 @@
         window.addEventListener('resize', setVideoSource);
     });
 </script>
+
 
 </body>
 </html>
