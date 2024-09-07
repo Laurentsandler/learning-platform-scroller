@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Learning Platform</title>
     <style>
-        body, html {
+          body, html {
             margin: 0;
             padding: 0;
             width: 100%;
@@ -14,7 +14,8 @@
             font-family: 'Roboto', sans-serif;
             color: #fff;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             background: radial-gradient(circle at 25% 25%, #ff7f50, transparent, transparent),
                         radial-gradient(circle at 75% 25%, #6495ed, transparent, transparent),
                         radial-gradient(circle at 25% 75%, #ff69b4, transparent, transparent),
@@ -39,7 +40,6 @@
             max-width: 400px;
             padding: 20px;
             text-align: center;
-            flex: 1;
         }
 
         .greeting {
@@ -69,6 +69,7 @@
             font-size: 18px;
             cursor: pointer;
         }
+
 
         button {
             background-color: #6c63ff;
@@ -140,31 +141,6 @@
             background-color: black;
         }
 
-        /* Navigation Bar Styles */
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.8);
-            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.5);
-        }
-
-        nav button {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 24px;
-            cursor: pointer;
-        }
-
-        nav button:hover {
-            color: #ccc;
-        }
     </style>
 </head>
 <body>
@@ -201,12 +177,6 @@
     <button onclick="nextQuestion()">Next Question</button>
 </div>
 
-<!-- Navigation Bar -->
-<div class="navbar">
-    <img id="homeButton" src="https://x5xyx35pwx90vl1i.public.blob.vercel-storage.com/House%20icon-INrnSZmd0ZQ67ZhUb7ZNVSSIcitJRd.svg" alt="Home">
-    <img id="plusButton" src="https://x5xyx35pwx90vl1i.public.blob.vercel-storage.com/Plus%20icon-ppM4HylWaT7LSFl2HdLDiqBaf7GKaQ.svg" alt="Plus">
-    <img id="profileButton" src="https://x5xyx35pwx90vl1i.public.blob.vercel-storage.com/User%20icon-e1GJfF1kz20GZJpa83UrduFmJJrIkl.svg" alt="Profile">
-</div>
 <script type="importmap">
     {
       "imports": {
@@ -362,21 +332,6 @@
         });
 
         window.addEventListener('resize', setVideoSource);
-
-        // Navigation buttons functionality
-        document.getElementById('homeButton').addEventListener('click', function() {
-            document.getElementById('noteContainer').style.display = 'none';
-            document.getElementById('homeScreenContainer').style.display = 'block';
-        });
-
-        document.getElementById('plusButton').addEventListener('click', function() {
-            document.getElementById('homeScreenContainer').style.display = 'none';
-            document.getElementById('noteContainer').style.display = 'block';
-        });
-
-        document.getElementById('profileButton').addEventListener('click', function() {
-            alert("Profile button clicked. Add your profile page functionality here.");
-        });
     });
 </script>
 
