@@ -192,10 +192,13 @@
     const genAI = new GoogleGenerativeAI(API_KEY);
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-    let questions = [];
+    llet questions = [];
     let currentQuestionIndex = 0;
+    let answeredQuestions = 0;
+    const maxQuestions = 20;
+    const generateAfter = 5; // New questions generated after every 5 answers
 
-    window.createQuestions = async function() {
+    async function createQuestions() {
         const notes = document.getElementById("notes").value.trim();
         if (!notes) {
             alert("Please paste your notes.");
@@ -273,20 +276,21 @@
     document.getElementById("feedback").textContent = isCorrect ? "Correct!" : `Incorrect! The correct answer was ${question.correctAnswer.toUpperCase()}`;
 };
 
-    window.nextQuestion = function() {
+    function nextQuestion() {
+        answeredQuestions++;
         currentQuestionIndex++;
+
         if (currentQuestionIndex < questions.length) {
             document.getElementById("feedbackContainer").style.display = 'none';
             document.getElementById("quizContainer").style.display = 'block';
             showQuestion();
-        } else {
-            alert("Quiz completed!");
-            // Reset quiz
+        } else if (answeredQuestions >= generateAfter) {
+            // Generate new set of questions after every 5 answers
             currentQuestionIndex = 0;
-            document.getElementById("feedbackContainer").style.display = 'none';
-            document.getElementById("homeScreenContainer").style.display = 'block';
+            answeredQuestions = 0;
+            createQuestions(); // Call to regenerate questions
         }
-    };
+    }
 
     window.handleSubjectClick = function(subject) {
         document.getElementById('homeScreenContainer').style.display = 'none';
