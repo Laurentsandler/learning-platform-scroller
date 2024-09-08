@@ -177,14 +177,6 @@
     <button onclick="nextQuestion()">Next Question</button>
 </div>
 
-<script type="importmap">
-    {
-      "imports": {
-        "@google/generative-ai": "https://esm.run/@google/generative-ai"
-      }
-    }
-</script>
-
 <script type="module">
     import { GoogleGenerativeAI } from "@google/generative-ai";
 
@@ -195,6 +187,7 @@
     let questions = [];
     let currentQuestionIndex = 0;
     let answeredQuestions = 0;  // Track how many questions have been answered
+    let additionalQuestions = [];  // Store the new questions generated after the original ones are answered
 
     window.createQuestions = async function() {
         const notes = document.getElementById("notes").value.trim();
@@ -218,7 +211,7 @@
 
         // Parse questions into array
         const newQuestions = parseQuestions(text);
-        questions = [...questions, ...newQuestions];  // Append new questions
+        questions = [...questions, ...newQuestions];  // Add new questions only when generated
         if (questions.length > 0) {
             document.getElementById("noteContainer").style.display = 'none';
             document.getElementById("quizContainer").style.display = 'block';
@@ -276,24 +269,57 @@
         answeredQuestions++;  // Increment the count of answered questions
     };
 
-    window.nextQuestion = function() {
+    window.nextQuestion = async function() {
         currentQuestionIndex++;
         if (currentQuestionIndex < questions.length) {
             document.getElementById("feedbackContainer").style.display = 'none';
             document.getElementById("quizContainer").style.display = 'block';
             showQuestion();
         } else if (answeredQuestions % 5 === 0) {
-            // Generate new questions after every 5 answered questions
-            alert("Generating new questions...");
-            createQuestions();  // Generate new questions
+            // Generate new questions after every 5 answered questions, but display them only after original set is completed
+            if (answeredQuestions >= 20 && additionalQuestions.length === 0) {
+                alert("Generating new questions...");
+                await generateAdditionalQuestions();
+            }
+            
+            if (additionalQuestions.length > 0) {
+                // Move to the next set of questions after the original ones are exhausted
+                questions = additionalQuestions;
+                additionalQuestions = [];
+                currentQuestionIndex = 0;
+                showQuestion();
+            } else {
+                alert("Quiz completed!");
+                // Reset quiz
+                currentQuestionIndex = 0;
+                document.getElementById("feedbackContainer").style.display = 'none';
+                document.getElementById("homeScreenContainer").style.display = 'block';
+            }
         } else {
-            alert("Quiz completed!");
-            // Reset quiz
-            currentQuestionIndex = 0;
             document.getElementById("feedbackContainer").style.display = 'none';
-            document.getElementById("homeScreenContainer").style.display = 'block';
+            document.getElementById("quizContainer").style.display = 'block';
+            showQuestion();
         }
     };
+
+    async function generateAdditionalQuestions() {
+        const notes = document.getElementById("notes").value.trim();
+        const prompt = `Generate 5 additional questions based on the following notes with three possible answers, and indicate the correct answer:
+        1. Question text?
+        a) Answer 1
+        b) Answer 2
+        c) Answer 3
+        Correct answer: a)`;
+
+        const fullPrompt = `${prompt}\n\nNotes: ${notes}`;
+
+        const result = await model.generateContent(fullPrompt);
+        const response = await result.response;
+        const text = response.text().replace(/\*/g, '');
+
+        // Parse new questions
+        additionalQuestions = parseQuestions(text);
+    }
 
     window.handleSubjectClick = function(subject) {
         document.getElementById('homeScreenContainer').style.display = 'none';
