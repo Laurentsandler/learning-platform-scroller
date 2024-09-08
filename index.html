@@ -194,11 +194,8 @@
 
     let questions = [];
     let currentQuestionIndex = 0;
-    let answeredQuestions = 0;
-    const maxQuestions = 20;
-    const generateAfter = 5; // New questions generated after every 5 answers
 
-    async function createQuestions() {
+    window.createQuestions = async function() {
         const notes = document.getElementById("notes").value.trim();
         if (!notes) {
             alert("Please paste your notes.");
@@ -276,21 +273,20 @@
     document.getElementById("feedback").textContent = isCorrect ? "Correct!" : `Incorrect! The correct answer was ${question.correctAnswer.toUpperCase()}`;
 };
 
-    function nextQuestion() {
-        answeredQuestions++;
+    window.nextQuestion = function() {
         currentQuestionIndex++;
-
         if (currentQuestionIndex < questions.length) {
             document.getElementById("feedbackContainer").style.display = 'none';
             document.getElementById("quizContainer").style.display = 'block';
             showQuestion();
-        } else if (answeredQuestions >= generateAfter) {
-            // Generate new set of questions after every 5 answers
+        } else {
+            alert("Quiz completed!");
+            // Reset quiz
             currentQuestionIndex = 0;
-            answeredQuestions = 0;
-            createQuestions(); // Call to regenerate questions
+            document.getElementById("feedbackContainer").style.display = 'none';
+            document.getElementById("homeScreenContainer").style.display = 'block';
         }
-    }
+    };
 
     window.handleSubjectClick = function(subject) {
         document.getElementById('homeScreenContainer').style.display = 'none';
@@ -355,3 +351,5 @@
 
 </body>
 </html>
+
+
