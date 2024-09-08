@@ -176,6 +176,13 @@
     <div id="feedback"></div>
     <button onclick="nextQuestion()">Next Question</button>
 </div>
+
+<script type="importmap">
+    {
+      "imports": {
+        "@google/generative-ai": "https://esm.run/@google/generative-ai"
+      }
+    }
 </script>
 
 <script type="module">
@@ -187,8 +194,6 @@
 
     let questions = [];
     let currentQuestionIndex = 0;
-    let answeredQuestions = 0;  // Track how many questions have been answered
-    let additionalQuestions = [];  // Store the new questions generated after the original ones are answered
 
     window.createQuestions = async function() {
         const notes = document.getElementById("notes").value.trim();
@@ -211,8 +216,7 @@
         const text = response.text().replace(/\*/g, ''); // Remove \* characters
 
         // Parse questions into array
-        const newQuestions = parseQuestions(text);
-        questions = [...questions, ...newQuestions];  // Add new questions only when generated
+        questions = parseQuestions(text);
         if (questions.length > 0) {
             document.getElementById("noteContainer").style.display = 'none';
             document.getElementById("quizContainer").style.display = 'block';
@@ -221,32 +225,33 @@
     };
 
     function parseQuestions(text) {
-        const rawQuestions = text.split(/\d+\./).filter(q => q.trim() !== "");
+    const rawQuestions = text.split(/\d+\./).filter(q => q.trim() !== "");
 
-        return rawQuestions.map(q => {
-            const lines = q.split('\n').map(str => str.trim());
+    return rawQuestions.map(q => {
+        const lines = q.split('\n').map(str => str.trim());
 
-            // Extract the question and answers
-            const question = lines[0];
-            const answerA = lines[1].split(") ")[1];
-            const answerB = lines[2].split(") ")[1];
-            const answerC = lines[3].split(") ")[1];
+        // Extract the question and answers
+        const question = lines[0];
+        const answerA = lines[1].split(") ")[1];
+        const answerB = lines[2].split(") ")[1];
+        const answerC = lines[3].split(") ")[1];
 
-            // Extract the correct answer (handling different cases)
-            const correctLine = lines[4];
-            const correctAnswerLetter = correctLine.match(/Correct answer: ([a-c])/i)[1];
+        // Extract the correct answer (handling different cases)
+        const correctLine = lines[4];
+        const correctAnswerLetter = correctLine.match(/Correct answer: ([a-c])/i)[1];
 
-            return {
-                question,
-                answers: {
-                    a: answerA,
-                    b: answerB,
-                    c: answerC
-                },
-                correctAnswer: correctAnswerLetter // Store 'a', 'b', or 'c'
-            };
-        });
-    }
+        return {
+            question,
+            answers: {
+                a: answerA,
+                b: answerB,
+                c: answerC
+            },
+            correctAnswer: correctAnswerLetter // Store 'a', 'b', or 'c'
+        };
+    });
+}
+
 
     function showQuestion() {
         const question = questions[currentQuestionIndex];
@@ -257,75 +262,36 @@
     }
 
     window.submitAnswer = function(selectedAnswer) {
-        const question = questions[currentQuestionIndex];
+    const question = questions[currentQuestionIndex];
 
-        // Check if the selected answer matches the correct answer letter
-        const isCorrect = (selectedAnswer === question.correctAnswer);
+    // Check if the selected answer matches the correct answer letter
+    const isCorrect = (selectedAnswer === question.correctAnswer);
 
-        // Provide feedback based on whether the answer was correct
-        document.getElementById("quizContainer").style.display = 'none';
-        document.getElementById("feedbackContainer").style.display = 'block';
-        document.getElementById("feedback").textContent = isCorrect ? "Correct!" : `Incorrect! The correct answer was ${question.correctAnswer.toUpperCase()}`;
+    // Provide feedback based on whether the answer was correct
+    document.getElementById("quizContainer").style.display = 'none';
+    document.getElementById("feedbackContainer").style.display = 'block';
+    document.getElementById("feedback").textContent = isCorrect ? "Correct!" : `Incorrect! The correct answer was ${question.correctAnswer.toUpperCase()}`;
+};
 
-        answeredQuestions++;  // Increment the count of answered questions
-    };
-
-    window.nextQuestion = async function() {
+    window.nextQuestion = function() {
         currentQuestionIndex++;
         if (currentQuestionIndex < questions.length) {
             document.getElementById("feedbackContainer").style.display = 'none';
             document.getElementById("quizContainer").style.display = 'block';
             showQuestion();
-        } else if (answeredQuestions % 5 === 0) {
-            // Generate new questions after every 5 answered questions, but display them only after original set is completed
-            if (answeredQuestions >= 20 && additionalQuestions.length === 0) {
-                alert("Generating new questions...");
-                await generateAdditionalQuestions();
-            }
-            
-            if (additionalQuestions.length > 0) {
-                // Move to the next set of questions after the original ones are exhausted
-                questions = additionalQuestions;
-                additionalQuestions = [];
-                currentQuestionIndex = 0;
-                showQuestion();
-            } else {
-                alert("Quiz completed!");
-                // Reset quiz
-                currentQuestionIndex = 0;
-                document.getElementById("feedbackContainer").style.display = 'none';
-                document.getElementById("homeScreenContainer").style.display = 'block';
-            }
         } else {
+            alert("Quiz completed!");
+            // Reset quiz
+            currentQuestionIndex = 0;
             document.getElementById("feedbackContainer").style.display = 'none';
-            document.getElementById("quizContainer").style.display = 'block';
-            showQuestion();
+            document.getElementById("homeScreenContainer").style.display = 'block';
         }
     };
-
-    async function generateAdditionalQuestions() {
-        const notes = document.getElementById("notes").value.trim();
-        const prompt = `Generate 5 additional questions based on the following notes with three possible answers, and indicate the correct answer:
-        1. Question text?
-        a) Answer 1
-        b) Answer 2
-        c) Answer 3
-        Correct answer: a)`;
-
-        const fullPrompt = `${prompt}\n\nNotes: ${notes}`;
-
-        const result = await model.generateContent(fullPrompt);
-        const response = await result.response;
-        const text = response.text().replace(/\*/g, '');
-
-        // Parse new questions
-        additionalQuestions = parseQuestions(text);
-    }
 
     window.handleSubjectClick = function(subject) {
         document.getElementById('homeScreenContainer').style.display = 'none';
         document.getElementById('noteContainer').style.display = 'block';
-    };
+    }
 
     document.addEventListener('DOMContentLoaded', function () {
         const userData = JSON.parse(localStorage.getItem('userData'));
@@ -382,7 +348,6 @@
         window.addEventListener('resize', setVideoSource);
     });
 </script>
-
 
 </body>
 </html>
