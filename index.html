@@ -270,7 +270,7 @@
     // Provide feedback based on whether the answer was correct
     document.getElementById("quizContainer").style.display = 'none';
     document.getElementById("feedbackContainer").style.display = 'block';
-    document.getElementById("feedback").textContent = isCorrect ? "Correct!" : `Incorrect! The correct answer was ${question.correctAnswer.toUpperCase()}`;
+    document.getElementById("feedback").textContent = isCorrect ? "Correct!" : `Incorrect! The correct answer was ${question.correctLine()}`;
 };
 
     window.nextQuestion = function() {
