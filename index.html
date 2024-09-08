@@ -192,7 +192,7 @@
     const genAI = new GoogleGenerativeAI(API_KEY);
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-    llet questions = [];
+    let questions = [];
     let currentQuestionIndex = 0;
     let answeredQuestions = 0;
     const maxQuestions = 20;
