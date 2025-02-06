@@ -177,21 +177,7 @@
     <button onclick="nextQuestion()">Next Question</button>
 </div>
 
-<script type="importmap">
-    {
-      "imports": {
-        "@google/generative-ai": "https://esm.run/@google/generative-ai"
-      }
-    }
-</script>
-
-<script type="module">
-    import { GoogleGenerativeAI } from "@google/generative-ai";
-
-    const API_KEY = "AIzaSyDlnzhYoACjTrAjo_murZPYHnZ2wo1CZBk";
-    const genAI = new GoogleGenerativeAI(API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-
+<script>
     let questions = [];
     let currentQuestionIndex = 0;
 
@@ -211,47 +197,68 @@
 
         const fullPrompt = `${prompt}\n\nNotes: ${notes}`;
 
-        const result = await model.generateContent(fullPrompt);
-        const response = await result.response;
-        const text = response.text().replace(/\*/g, ''); // Remove \* characters
+        try {
+            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer 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'
+                },
+                body: JSON.stringify({
+                    messages: [{ role: 'user', content: fullPrompt }],
+                    model: 'deepseek-r1-distill-llama-70b',
+                    temperature: 1,
+                    top_p: 1,
+                    stream: false,
+                    stop: null
+                })
+            });
 
-        // Parse questions into array
-        questions = parseQuestions(text);
-        if (questions.length > 0) {
-            document.getElementById("noteContainer").style.display = 'none';
-            document.getElementById("quizContainer").style.display = 'block';
-            showQuestion();
+            if (response.ok) {
+                const data = await response.json();
+                const text = data.choices[0].message?.content;
+                questions = parseQuestions(text);
+                if (questions.length > 0) {
+                    document.getElementById("noteContainer").style.display = 'none';
+                    document.getElementById("quizContainer").style.display = 'block';
+                    showQuestion();
+                }
+            } else {
+                throw new Error('Failed to generate questions');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error generating questions. Please try again.');
         }
     };
 
     function parseQuestions(text) {
-    const rawQuestions = text.split(/\d+\./).filter(q => q.trim() !== "");
+        const rawQuestions = text.split(/\d+\./).filter(q => q.trim() !== "");
 
-    return rawQuestions.map(q => {
-        const lines = q.split('\n').map(str => str.trim());
+        return rawQuestions.map(q => {
+            const lines = q.split('\n').map(str => str.trim());
 
-        // Extract the question and answers
-        const question = lines[0];
-        const answerA = lines[1].split(") ")[1];
-        const answerB = lines[2].split(") ")[1];
-        const answerC = lines[3].split(") ")[1];
+            // Extract the question and answers
+            const question = lines[0];
+            const answerA = lines[1].split(") ")[1];
+            const answerB = lines[2].split(") ")[1];
+            const answerC = lines[3].split(") ")[1];
 
-        // Extract the correct answer (handling different cases)
-        const correctLine = lines[4];
-        const correctAnswerLetter = correctLine.match(/Correct answer: ([a-c])/i)[1];
+            // Extract the correct answer (handling different cases)
+            const correctLine = lines[4];
+            const correctAnswerLetter = correctLine.match(/Correct answer: ([a-c])/i)[1];
 
-        return {
-            question,
-            answers: {
-                a: answerA,
-                b: answerB,
-                c: answerC
-            },
-            correctAnswer: correctAnswerLetter // Store 'a', 'b', or 'c'
-        };
-    });
-}
-
+            return {
+                question,
+                answers: {
+                    a: answerA,
+                    b: answerB,
+                    c: answerC
+                },
+                correctAnswer: correctAnswerLetter // Store 'a', 'b', or 'c'
+            };
+        });
+    }
 
     function showQuestion() {
         const question = questions[currentQuestionIndex];
@@ -262,16 +269,16 @@
     }
 
     window.submitAnswer = function(selectedAnswer) {
-    const question = questions[currentQuestionIndex];
+        const question = questions[currentQuestionIndex];
 
-    // Check if the selected answer matches the correct answer letter
-    const isCorrect = (selectedAnswer === question.correctAnswer);
+        // Check if the selected answer matches the correct answer letter
+        const isCorrect = (selectedAnswer === question.correctAnswer);
 
-    // Provide feedback based on whether the answer was correct
-    document.getElementById("quizContainer").style.display = 'none';
-    document.getElementById("feedbackContainer").style.display = 'block';
-    document.getElementById("feedback").textContent = isCorrect ? "Correct!" : `Incorrect! The correct answer was ${question.correctAnswer.toUpperCase()}`;
-};
+        // Provide feedback based on whether the answer was correct
+        document.getElementById("quizContainer").style.display = 'none';
+        document.getElementById("feedbackContainer").style.display = 'block';
+        document.getElementById("feedback").textContent = isCorrect ? "Correct!" : `Incorrect! The correct answer was ${question.correctAnswer.toUpperCase()}`;
+    };
 
     window.nextQuestion = function() {
         currentQuestionIndex++;
@@ -351,5 +358,3 @@
 
 </body>
 </html>
-
-
